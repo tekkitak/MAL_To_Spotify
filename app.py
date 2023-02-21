@@ -3,8 +3,9 @@ from flask_session import Session
 from urllib.parse import urlencode
 import requests as rq
 from os import getenv
+import json
 
-from helper_functions import get_new_code
+from helper_functions import get_new_code, mal_get_OAuth, mal_auth_user_url, mal_is_valid, mal_refresh_token
 
 
 app = Flask(__name__)
@@ -33,34 +34,46 @@ def malAuth():
 
     return redirect(url_for('index'))
 
-
-
-def mal_get_OAuth(code):
-    url = "https://myanimelist.net/v1/oauth2/token"
-    params = {
-        'client_id': getenv('MAL_ID'),
-        'client_secret': getenv('MAL_SECRET'),
-        'code': code,
-        'code_verifier': session['mal_verifier'],
-        'grant_type': 'authorization_code',
-        'redirect_uri': 'http://localhost:5000/auth/mal'
-    }
-    req = rq.post(url, data=params)
-    if req.json().get('error', None) != None:
-        raise Exception(req.json()['error'])
-    return req.json()
-
-def mal_auth_user_url():
-    if session.get('mal_verifier', None) == None:
-        session['mal_verifier'] = get_new_code()
+@app.route('/mal/animeOpList')
+def malAnimeOpList():
+    op_list =  []
+    anime_list = []
+    if not mal_is_valid():
+        mal_refresh_token()
+    auth_str = "Bearer " + session["mal_access_token"]
     
-    url = "https://myanimelist.net/v1/oauth2/authorize"
-    params = {
-        'response_type': 'code', 
-        'client_id': getenv('MAL_ID'), 
-        'redirect_uri': 'http://localhost:5000/auth/mal', 
-        'code_challenge_method': 'plain',
-        'code_challenge': session['mal_verifier']
-    }
+    url = "https://api.myanimelist.net/v2/users/@me/animelist"
+    offset = 0
+    while True:
+        ret = rq.get(url, params={'fields': 'list_status', "limit": 25, "offset": offset}, headers={"Authorization": auth_str}).json()
+        if ret.get("error", None) != None:
+            raise Exception("animelist", ret["error"])
+        anime_list += ret["data"]
+        if ret["paging"].get("next", None) == None:
+            break
+        offset += 25
+    if session.get("mal_anime_cache", None) == None:
+        session["mal_anime_cache"] = []
+    for anime in anime_list:
+        if request.args.get("completed_only", "true") == "true" and anime["list_status"]["status"] != "completed":
+            print("skipping anime " + anime["node"]["title"])
+            continue
+        
+        if anime["node"]["title"] in [x["title"] for x in session["mal_anime_cache"]]:
+            i = 0
+            while anime["node"]["title"] != session["mal_anime_cache"][i]["title"]:
+                i += 1
+            op_list.append(session["mal_anime_cache"][i])
+            continue
 
-    return url + '?' + urlencode(params)
+        anime_data = {"title": anime["node"]["title"], "op": []}
+        url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
+        ret = rq.get(url, params={"fields": "opening_themes"}, headers={"Authorization": auth_str}).json()
+        if ret.get("error", None) != None:
+            raise Exception("animedetails", ret["error"])
+
+        anime_data["op"] = [x["text"] for x in ret.get("opening_themes", [])]
+        
+        op_list.append(anime_data)
+        session["mal_anime_cache"].append(anime_data)
+    return json.dumps(op_list)
