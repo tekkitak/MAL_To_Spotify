@@ -3,8 +3,9 @@ from flask_session import Session
 from urllib.parse import urlencode
 import requests as rq
 from os import getenv
-from base64 import b64encode as b64en
 import json
+from datetime import datetime, timedelta
+from helper_functions import exec_request, refresh_auth, encode_base64
 
 
 app = Flask(__name__)
@@ -18,6 +19,12 @@ Session(app)
 
 @app.route('/')
 def index():
+    # session.clear()
+    # session['token_expiration_time'] = datetime.now() - timedelta(seconds=1)
+    if session.get('spotify_access_token', False) != False:
+        if session['token_expiration_time'] < datetime.now():
+            refresh_auth()
+    print("expiration time:" + (session['token_expiration_time'].strftime("%m/%d/%Y, %H:%M:%S")) if 'token_expiration_time' in session else "None")
     return render_template('index.html', Spotify_OAuth_url=url_for('spotifyAuth'), Spotify_CreatePlaylist_url=url_for('create_spotify_playlist'))
 
 
@@ -30,7 +37,7 @@ def spotifyAuth():
             "client_id":getenv('SPOT_ID', None),
             "response_type":"code",
             "redirect_uri":"http://localhost:5000/auth/spotify",
-            "scope":"playlist-modify-private playlist-modify-public user-library-read user-library-modify user-read-private"
+            "scope":"playlist-modify-private playlist-modify-public user-library-read user-library-modify"
             }
         redirectUrl = url + '?' + urlencode(querystring)
         return redirect(redirectUrl)
@@ -40,12 +47,9 @@ def spotifyAuth():
     session['spotify_access_token'] = out['access_token']
     session['spotify_refresh_token'] = out['refresh_token']
     session['spotify_token_type'] = out['token_type']
-
-    print(session['spotify_access_token'])
-    print(session['spotify_refresh_token'])
-    print(session['spotify_token_type'])
+    session['token_expiration_time'] = datetime.now() + timedelta(seconds=out['expires_in'])
+    session['spotify_refresh_token'] = out['refresh_token']
     
-    # return out
     return redirect(url_for('index'))
 
 
@@ -64,16 +68,17 @@ def spotify_get_OAuth(code):
         'Authorization': 'Basic ' + encode_base64(getenv('SPOT_ID') + ':' + getenv('SPOT_SECRET')),
         'Content-type': 'application/x-www-form-urlencoded'
     }
-    req = rq.post(url, data=body, headers=headers)
+    req = exec_request(url, headers=headers, data=body, method='POST', auth=False)
 
-    # if req.json().get('error', None) != None:
-    #     raise Exception(req.json()['error'])
+    print('spotify_get_OAuth')
+    print(req.text)
+    if req.status_code == 401:
+        return redirect(url_for('index')) 
     return req.json()
 
 
 
-def encode_base64(string):
-    return b64en(string.encode('ascii')).decode('ascii')
+
 
 
 @app.route('/createPlaylist')
@@ -90,9 +95,7 @@ def create_spotify_playlist():
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = rq.post(url, data=data, headers=headers)
-    print('create_spotify_playlist')
-    print(response.text)
+    response = exec_request(url, headers=headers, data=data, method='POST')
     return redirect(url_for('index'))
 
 
@@ -102,14 +105,17 @@ def get_spotify_user_profile():
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = rq.get(url, headers=headers)
-    print('get_spotify_user_profile')
-    print(response.text)
-    return response.json()
+    response = exec_request(url, headers=headers, method='GET')
+
+    if response.status_code == 401:
+        session['spotify_access_token'] = False
+        return redirect(url_for('index'))
+    return response.json() if response.status_code == 200 else False
 
 
 
-def playlist_add_songs(uris):
+def playlist_add_songs(uris, playlist_id):
+    url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
@@ -118,8 +124,7 @@ def playlist_add_songs(uris):
         "uris": uris,
         "position": 0
         }
-    response = rq.post(json.dumps(data), headers=headers)
-    print(response.text)
+    response = exec_request(url, headers=headers, data=data, method='POST')
     return response.json()
 
 
