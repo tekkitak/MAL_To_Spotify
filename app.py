@@ -19,7 +19,7 @@ Session(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html', MAL_OAuth_url=url_for('malAuth'))
+    return render_template('index.j2', MAL_OAuth_url=url_for('malAuth'))
 
 @app.route('/auth/mal')
 def malAuth(): 

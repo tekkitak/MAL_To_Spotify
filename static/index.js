@@ -12,12 +12,12 @@ $().ready(function() {
             { 
                 data: "op",
                 render: (dt, tp, rw) => {
-                    out_str = "";
+                    out_str = "<ul class='no-style'>";
                     for (let i = 0; i < dt.length; i++) {
                         let name = dt[i].match(/\"(.+?)\"/)[1];
-                        out_str += `${name}<br>`;
+                        out_str += `<li>${name}</li>`;
                     }
-                    return out_str;
+                    return out_str+"</ul>";
                 }
             },
         ]
