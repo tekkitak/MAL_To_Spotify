@@ -6,6 +6,7 @@ from os import getenv
 import json
 from datetime import datetime, timedelta
 from helper_functions import exec_request, refresh_auth, encode_base64
+from typing import cast, Any, Union
 
 from oauth2 import OAuth2, MalOAuth2Builder
 
@@ -57,23 +58,25 @@ def spotifyAuth():
 
 
 
-def spotify_get_OAuth(code):
+def spotify_get_OAuth(code) -> Union[dict,Any]:
+    assert getenv('SPOT_ID') != None and getenv('SPOT_SECRET') != None, 'SPOT_ID or SPOT_SECRET not set'
+    spot_id:str     = cast(str,getenv('SPOT_ID'))
+    spot_secret:str = cast(str,getenv('SPOT_SECRET'))
+    
     url = "https://accounts.spotify.com/api/token"
     body = {
         'code': code,
         'grant_type': 'authorization_code',
         'redirect_uri': 'http://localhost:5000/auth/spotify',
-        'client_id': getenv('SPOT_ID'),
-        'client_secret': getenv('SPOT_SECRET'),
+        'client_id': spot_id,
+        'client_secret': spot_secret,
     }
     headers = {
-        'Authorization': 'Basic ' + encode_base64(getenv('SPOT_ID') + ':' + getenv('SPOT_SECRET')),
+        'Authorization': 'Basic ' + encode_base64(spot_id + ':' + spot_secret),
         'Content-type': 'application/x-www-form-urlencoded'
     }
-    req = exec_request(url, headers=headers, data=body, method='POST', auth=False)
+    req = cast(rq.Response, exec_request(url, headers=headers, data=body, method='POST', auth=False))
 
-    print('spotify_get_OAuth')
-    print(req.text)
     if req.status_code == 401:
         return redirect(url_for('index')) 
     return req.json()
@@ -101,22 +104,23 @@ def create_spotify_playlist():
     return redirect(url_for('index'))
 
 
-def get_spotify_user_profile():
+def get_spotify_user_profile() -> Union[dict,Any]:
     url = "https://api.spotify.com/v1/me"
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = exec_request(url, headers=headers, method='GET')
+    response = cast(rq.Response,exec_request(url, headers=headers, method='GET'))
 
     if response.status_code == 401:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))
-    return response.json() if response.status_code == 200 else False
+    if response.status_code != 200: raise Exception('Error getting user profile')
+    return response.json() 
 
 
 
-def playlist_add_songs(uris, playlist_id):
+def playlist_add_songs(uris, playlist_id) -> dict:
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     headers = {
         "Content-Type":"application/json",
@@ -126,10 +130,10 @@ def playlist_add_songs(uris, playlist_id):
         "uris": uris,
         "position": 0
         }
-    response = exec_request(url, headers=headers, data=data, method='POST')
+    response = cast(rq.Response,exec_request(url, headers=headers, data=data, method='POST'))
     return response.json()
 
-@app.route('/spotify/getSongUri/<string:name>/<string:artist>')
+@app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
 def get_song_uri(name = None, artist = None):
     url = "https://api.spotify.com/v1/search"
     querystring = {
@@ -141,7 +145,7 @@ def get_song_uri(name = None, artist = None):
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = exec_request(url, headers=headers, params=querystring, method='GET')
+    response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
     if response.status_code == 401:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))

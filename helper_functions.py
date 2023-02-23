@@ -5,9 +5,10 @@ from os import getenv
 from urllib.parse import urlencode
 from datetime import datetime, timedelta
 from base64 import b64encode as b64en
+from typing import Union, cast
+from werkzeug.wrappers.response import Response
 
-
-def exec_request(url, headers=None, params=None, data=None, method='GET', auth=True):
+def exec_request(url, headers=None, params=None, data=None, method='GET', auth=True) -> Union[Response, rq.Response]:
 
     if auth:
         if session.get('spotify_access_token', False) == False:
@@ -26,21 +27,21 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
         Exception(res.json()["error"])
     return res
 
-def refresh_auth():
-    print (session['spotify_refresh_token'])
+def refresh_auth() -> None:
     url = "https://accounts.spotify.com/api/token"
     body = {
         'grant_type': 'refresh_token',
         'refresh_token': session['spotify_refresh_token'],
     }
+    assert getenv('SPOT_ID') != None and getenv('SPOT_SECRET') != None, 'SPOT_ID or SPOT_SECRET not set'
+    spot_id:str     = cast(str,getenv('SPOT_ID'))
+    spot_secret:str = cast(str,getenv('SPOT_SECRET'))
     headers = {
-        'Authorization': 'Basic ' + encode_base64(getenv('SPOT_ID') + ':' + getenv('SPOT_SECRET')),
+        'Authorization': 'Basic ' + encode_base64(spot_id + ':' + spot_secret),
     }
-    req = exec_request(url, headers=headers, data=body, method='POST', auth=False)
-    print('refresh_auth')
-    print(req.text)
-    session['spotify_access_token'] = req.json()['access_token']
-    session['token_expiration_time'] = datetime.now() + timedelta(seconds=req.json()['expires_in'])
+    req: dict = cast(rq.Response, exec_request(url, headers=headers, data=body, method='POST', auth=False)).json()
+    session['spotify_access_token'] = req['access_token']
+    session['token_expiration_time'] = datetime.now() + timedelta(seconds=req['expires_in'])
 
-def encode_base64(string):
+def encode_base64(string:str) -> str:
     return b64en(string.encode('ascii')).decode('ascii')
