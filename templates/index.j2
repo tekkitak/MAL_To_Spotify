@@ -1,0 +1,36 @@
+{% extends 'base.j2' %}
+
+{% block title %} Home {% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+<script src="//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <h1>Home</h1>
+    <p>This is example page</p>
+    {% if session.get('mal_oauth', 'Empty') == 'Empty' or not session['mal_oauth'].token_valid(): %}
+    <p>This is OAuth <a href="{{MAL_OAuth_url}}">link</a> to auth MAL</p>
+    {% else %}
+    <p>You are authorized to MyAnimeList!</p>
+    <br>
+    <div class="table-enclosure">
+        <table id="openings_table" class="display compact">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Openings</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class="code-display">
+        <code>Bearer token: {{session['mal_oauth'].get_Bearer()}}</code>
+    </div>
+    {% endif %}
+{% endblock %}

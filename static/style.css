@@ -1,0 +1,24 @@
+.code-display {
+    border: 1px solid black; 
+    background-color: #f0f0f0; 
+    padding: .5em; 
+    width: 50%;
+    max-width: 90%;
+    max-height: 250px;
+    overflow: scroll; 
+    overflow-wrap: break-word;
+    resize: both;
+}
+
+.table-enclosure {
+    max-width: 1200px;
+}
+#openings_table {
+    width: 100%;
+}
+
+.no-style {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
