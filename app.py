@@ -24,7 +24,8 @@ def index():
     if session.get('spotify_access_token', False) != False:
         if session['token_expiration_time'] < datetime.now():
             refresh_auth()
-    print("expiration time:" + (session['token_expiration_time'].strftime("%m/%d/%Y, %H:%M:%S")) if 'token_expiration_time' in session else "None")
+    # print("expiration time:" + (session['token_expiration_time'].strftime("%m/%d/%Y, %H:%M:%S")) if 'token_expiration_time' in session else "None")
+
     return render_template('index.html', Spotify_OAuth_url=url_for('spotifyAuth'), Spotify_CreatePlaylist_url=url_for('create_spotify_playlist'))
 
 
@@ -81,7 +82,7 @@ def spotify_get_OAuth(code):
 
 
 
-@app.route('/createPlaylist')
+@app.route('/spotify/createPlaylist')
 def create_spotify_playlist():
     user_profile = get_spotify_user_profile()
     user_id = user_profile['id']
@@ -127,14 +128,23 @@ def playlist_add_songs(uris, playlist_id):
     response = exec_request(url, headers=headers, data=data, method='POST')
     return response.json()
 
+@app.route('/spotify/getSongUri/<string:name>/<string:artist>')
+def get_song_uri(name = None, artist = None):
+    url = "https://api.spotify.com/v1/search"
+    querystring = {
+        "q":f"track:{name} artist:{artist}",
+        "type":"track",
+        "limit":"1"
+        }
+    headers = {
+        "Content-Type":"application/json",
+        "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
+        }
+    response = exec_request(url, headers=headers, params=querystring, method='GET')
+    if response.status_code == 401:
+        session['spotify_access_token'] = False
+        return redirect(url_for('index'))
+    return response.json()['tracks']['items'][0]['uri'] if response.status_code == 200 else False
+    
+    
 
-def get_song_uri(name):
-    #TODO: get song uri from spotify
-    pass
-
-
-def process_mal_list(songs):
-    uris = []
-    for song in songs:
-        uris += get_song_uri(song)
-    return uris
