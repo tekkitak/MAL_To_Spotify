@@ -1,5 +1,4 @@
 .env
 __pycache__/**
-.vscode/**
-idk.yml
 flask_session/**
+.vscode/**
