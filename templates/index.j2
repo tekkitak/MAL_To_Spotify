@@ -37,7 +37,9 @@
     <p>This is OAuth <a href="{{Spotify_OAuth_url}}">link</a> to auth Spotify</p>
     {% else %}
     <p>You are already authorized to Spotify!</p>
-    <p>Bearer token: {{session.get('spotify_access_token')}}</p>
     <p>You can create your playlist <a href="{{Spotify_CreatePlaylist_url}}">here</a></p>
+    <div class="code-display">
+        <code>Bearer token: {{session.get('spotify_access_token')}}</code>
+    </div>
     {% endif %}
 {% endblock %}
