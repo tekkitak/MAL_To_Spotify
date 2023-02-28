@@ -14,7 +14,7 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
         if session.get('spotify_access_token', False) == False:
             # print('redirected for no token')
             return redirect(url_for('index'))
-        if session.get('token_expiration_time') < datetime.now():
+        if session.get('token_expiration_time', datetime.now() + timedelta(seconds=1)) < datetime.now():
             # print('redirected for token expiration')
             refresh_auth()
 
