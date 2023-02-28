@@ -151,7 +151,8 @@ def get_song_uri(name = None, artist = None) -> Union[str,Any]:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))
     if response.status_code != 200: raise Exception('Error getting song uri') 
-    return response.json()['tracks']['items'][0]['uri'] 
+    if response.json()['tracks']['total'] == 0: return None
+    return response.json()['tracks']['items'][0]['uri']
    
     
     
@@ -196,7 +197,7 @@ def malAnimeOpList():
         params["offset"] += 25
 
     # We define a cache to avoid making too many requests to the API    
-    if session.get("mal_anime_cache", None) == None:
+    if session.get("mal_anime_cache", None) == None or type(session["mal_anime_cache"][0]["op"]) == type([]):
         session["mal_anime_cache"] = []
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
@@ -222,9 +223,11 @@ def malAnimeOpList():
         if ret.get("error", None) != None:
             raise Exception("animedetails", ret["error"])
 
+        if ret.get("opening_themes", None) == None:
+            continue
         for opening in ret.get("opening_themes"):
-            regex = '"([^()\n\r\"]+)(?: \(.+\))?\\" by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?'
-            mtch = re.match(regex, opening["text"])
+            regex = r'"([^()\n\r\"]+)(?: \(.+\))?\\?".* by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?'
+            mtch = re.search(regex, opening["text"])
             if mtch == None:
                 raise Exception("regex", f"regex failed to match string {opening['text']}")
             anime_data = {
