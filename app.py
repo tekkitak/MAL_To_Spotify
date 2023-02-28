@@ -18,16 +18,38 @@ app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 Session(app)
 
 
-
+@app.route('/ajaxTest')
+def ajaxTest():
+    outJson = [
+        {
+            'title': 'Anime',
+            'op_title': 'Opening name',
+            'op_uri': 'spotify:link:idk'
+        },
+        {
+            'title': 'Anime',
+            'op_title': 'Opening name1',
+            'op_uri': 'spotify:link:idk1'
+        },
+        {
+            'title': 'Anime2',
+            'op_title': 'Opening name2',
+            'op_uri': 'spotify:link:idk2'
+        },
+        {
+            'title': 'Anime3',
+            'op_title': 'Opening name3',
+            'op_uri': 'spotify:track:4o1s691Qn6lUmFh1Bl28NG'
+        },
+    ]
+    return json.dumps(outJson)
 
 @app.route('/')
 def index():
     # session.clear()
-    # session['token_expiration_time'] = datetime.now() - timedelta(seconds=1)
     if session.get('spotify_access_token', False) != False:
         if session['token_expiration_time'] < datetime.now():
             refresh_auth()
-    # print("expiration time:" + (session['token_expiration_time'].strftime("%m/%d/%Y, %H:%M:%S")) if 'token_expiration_time' in session else "None")
 
     return render_template('index.j2', Spotify_OAuth_url=url_for('spotifyAuth'), Spotify_CreatePlaylist_url=url_for('create_spotify_playlist'), MAL_OAuth_url=url_for('malAuth'))
 
@@ -48,6 +70,8 @@ def spotifyAuth():
     
     code = request.args.get('code')
     out = spotify_get_OAuth(code)
+    if out == None:
+        return redirect(url_for('index'))
     session['spotify_access_token'] = out['access_token']
     session['spotify_refresh_token'] = out['refresh_token']
     session['spotify_token_type'] = out['token_type']
@@ -102,6 +126,7 @@ def create_spotify_playlist():
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
     response = exec_request(url, headers=headers, data=data, method='POST')
+    print(response.text)
     return redirect(url_for('index'))
 
 
@@ -120,18 +145,21 @@ def get_spotify_user_profile() -> Union[dict,Any]:
     return response.json() 
 
 
-
-def playlist_add_songs(uris, playlist_id) -> dict:
+@app.route('/spotify/addSongs/<string:playlist_id>/<string:uris>')
+def playlist_add_songs(uris, playlist_id):
+    uris = uris.split(',')
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
+    print (uris)
     data = {
         "uris": uris,
         "position": 0
         }
-    response = cast(rq.Response,exec_request(url, headers=headers, data=data, method='POST'))
+    
+    response = exec_request(url, headers=headers, data=json.dumps(data), method='POST')
     return response.json()
 
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore

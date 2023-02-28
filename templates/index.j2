@@ -4,8 +4,14 @@
 
 {% block head %}
 <script src="{{ url_for('static', filename='index.js') }}"></script>
-<link rel="stylesheet" href="//cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+
+{# <link rel="stylesheet" href="//cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css"> #}
 <script src="//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.css"/>
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.js"></script>
+
+<script src="{{ url_for('static', filename='dataTables.rowsGroup.js') }}"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -19,10 +25,6 @@
     <div class="table-enclosure">
         <table id="openings_table" class="display compact">
             <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Openings</th>
-                </tr>
             </thead>
             <tbody>
             </tbody>
