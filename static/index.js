@@ -41,23 +41,15 @@ $().ready(function() {
             {
                 text: 'Add to playlist',
                 action: function ( e, dt, node, config ) {
-                    // Get selected rows by checking the checkbox
-
                     let uris = [];
                     $('#openings_table input[type=checkbox]:checked').each(function() {
                         uris.push($(this).attr('name'));
                     });
                     console.log(uris);
 
-                    $.ajax({
-                        url: "/addPlaylist",
-                        type: "POST",
-                        data: JSON.stringify(uris),
-                        contentType: "application/json",
-                        success: function (data) {
-                            console.log(data);
-                        }
-                    });
+                    let playlist_id = '2oueshz4MUAmS638yUJUWm'
+
+                    window.location.href = `/spotify/addSongs/${playlist_id}/${uris.join(',')}`;
                 }
             },
             {
