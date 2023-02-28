@@ -12,11 +12,16 @@ $().ready(function () {
             url: "/mal/animeOpList",
             dataSrc: (json) => {
                 return json.filter(function (item) {
+                    return true
                     return item.op_uri != null;
                 });
             }
         },
         stateSave: true,
+        paging: false,
+        scrollY: "calc(100vh - 500px)",
+        scrollCollapse: true,
+
         columns: [
             {
                 title: "Uri",
@@ -31,8 +36,14 @@ $().ready(function () {
                 title: "Song",
                 data: "op_title",
                 render: (data, type, row, meta) => {
+                    if(row.op_uri == null)
+                    return data;
                     return `<a href='https://open.spotify.com/album/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
                 }
+            },
+            {
+                title: "Artist",
+                data: "op_artist",
             },
             {
                 title: "Include",
@@ -46,7 +57,7 @@ $().ready(function () {
             { targets: [0], visible: false },
         ],
         rowsGroup: [
-            'first:name'
+            'first:name',
         ],
         buttons: [
             {

@@ -22,7 +22,8 @@
     <p>This is example page</p>
     {% if session.get('mal_oauth', 'Empty') == 'Empty' or not session['mal_oauth'].token_valid(): %}
     <p>This is OAuth <a href="{{MAL_OAuth_url}}">link</a> to auth MAL</p>
-    {% else %}
+    {% else%}
+    {% if session.get('spotify_access_token', 'Empty') != 'Empty': %}
     <p>You are authorized to MyAnimeList!</p>
     <br>
     <div class="table-enclosure">
@@ -34,6 +35,7 @@
         </table>
     </div>
     <br>
+    {% endif %}
     <div class="code-display">
         <code>Bearer token: {{session['mal_oauth'].get_Bearer()}}</code>
     </div>

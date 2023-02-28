@@ -207,11 +207,11 @@ def malAnimeOpList():
             continue
         
         if anime["node"]["title"] in [x["title"] for x in session["mal_anime_cache"]]:
-            i = 0
-            while anime["node"]["title"] != session["mal_anime_cache"][i]["title"]:
-                i += 1
-            op_list.append(session["mal_anime_cache"][i])
+            for cached in session["mal_anime_cache"]:
+                if cached["title"] == anime["node"]["title"]:
+                    op_list.append(cached)
             continue
+            
 
         url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
         ret = rq.get(url, params={"fields": "opening_themes"}, auth=OAuth).json()
