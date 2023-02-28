@@ -38,7 +38,7 @@ $().ready(function () {
                 render: (data, type, row, meta) => {
                     if(row.op_uri == null)
                     return data;
-                    return `<a href='https://open.spotify.com/album/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
+                    return `<a href='https://open.spotify.com/track/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
                 }
             },
             {
@@ -49,6 +49,8 @@ $().ready(function () {
                 title: "Include",
                 data: null,
                 render: (data, type, row) => {
+                    if(row.op_uri == null)
+                        return `<input type='checkbox' name='${row.op_uri}' disabled='true'>`
                     return `<input type='checkbox' name='${row.op_uri}'>`
                 }
             }
@@ -65,7 +67,9 @@ $().ready(function () {
                 action: function (e, dt, node, config) {
                     let uris = [];
                     $('#openings_table input[type=checkbox]:checked').each(function () {
-                        uris.push($(this).attr('name'));
+                        //check if checkbox is not disabled
+                        if (!$(this).prop('disabled'))
+                            uris.push($(this).attr('name'));
                     });
                     console.log(uris);
 
@@ -97,10 +101,20 @@ $().ready(function () {
                 text: 'Select all shown',
                 action: function (e, dt, node, config) {
                     $('#openings_table input[type=checkbox]').each(function () {
-                        $(this).prop('checked', true);
+                        if (!$(this).prop('disabled'))
+                            $(this).prop('checked', true);
                     });
                 }
-            }
+            },
+            {
+                text: 'Deselect all shown',
+                action: function (e, dt, node, config) {
+                    $('#openings_table input[type=checkbox]').each(function () {
+                        if (!$(this).prop('disabled'))
+                            $(this).prop('checked', false);
+                    });
+                }
+            },
         ]
     });
 
