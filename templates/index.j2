@@ -12,6 +12,9 @@
 
 <script src="{{ url_for('static', filename='dataTables.rowsGroup.js') }}"></script>
 
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -39,9 +42,15 @@
     <p>This is OAuth <a href="{{Spotify_OAuth_url}}">link</a> to auth Spotify</p>
     {% else %}
     <p>You are already authorized to Spotify!</p>
-    <p>You can create your playlist <a href="{{Spotify_CreatePlaylist_url}}">here</a></p>
     <div class="code-display">
         <code>Bearer token: {{session.get('spotify_access_token')}}</code>
+    </div>
+    <div class="playlists">
+        <select id="playlists-select" name="playlist">
+            {% for playlist in playlists %}
+                <option value="{{playlist.id}}">{{playlist.name}}</option>
+            {% endfor %}
+        </select>
     </div>
     {% endif %}
 {% endblock %}

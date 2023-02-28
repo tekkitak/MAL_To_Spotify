@@ -21,11 +21,12 @@ Session(app)
 @app.route('/')
 def index():
     # session.clear()
+    playlists = []
     if session.get('spotify_access_token', False) != False:
         if session['token_expiration_time'] < datetime.now():
             refresh_auth()
-
-    return render_template('index.j2', Spotify_OAuth_url=url_for('spotifyAuth'), Spotify_CreatePlaylist_url=url_for('create_spotify_playlist'), MAL_OAuth_url=url_for('malAuth'))
+        playlists = spotify_playlists()['items']
+    return render_template('index.j2', Spotify_OAuth_url=url_for('spotifyAuth'), MAL_OAuth_url=url_for('malAuth'), playlists=playlists)
 
 
 
@@ -83,13 +84,13 @@ def spotify_get_OAuth(code) -> Union[dict,Any]:
 
 
 
-@app.route('/spotify/createPlaylist')
-def create_spotify_playlist():
+@app.route('/spotify/createPlaylist/<string:name>')
+def create_spotify_playlist( name = 'MyAnimeList openings' ):
     user_profile = get_spotify_user_profile()
     user_id = user_profile['id']
     url = f"https://api.spotify.com/v1/users/{user_id}/playlists"
     data = '''{
-        "name":"MyAnimeList openings",
+        "name":"''' + name + '''",
         "description":"Openings from my MyAnimeList",
         "public":"false"
         }'''
@@ -97,9 +98,9 @@ def create_spotify_playlist():
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = exec_request(url, headers=headers, data=data, method='POST')
+    response = cast(rq.Response,exec_request(url, headers=headers, data=data, method='POST'))
     print(response.text)
-    return redirect(url_for('index'))
+    return response.json()['id']
 
 
 def get_spotify_user_profile() -> Union[dict,Any]:
@@ -129,7 +130,7 @@ def playlist_add_songs(uris, playlist_id):
         }
     
     response = exec_request(url, headers=headers, data=json.dumps(data), method='POST')
-    return response.json()
+    return redirect(url_for('index'))
 
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
 def get_song_uri(name = None, artist = None) -> Union[str,Any]:
@@ -235,3 +236,15 @@ def malAnimeOpList():
             session["mal_anime_cache"].append(anime_data)
         
     return json.dumps(op_list)
+
+@app.route('/spotify/playlists')
+def spotify_playlists():
+    url = "https://api.spotify.com/v1/me/playlists"
+    headers = {
+        "Content-Type":"application/json",
+        "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
+        }
+    response = cast(rq.Response,exec_request(url, headers=headers, method='GET'))
+
+    if response.status_code != 200: raise Exception('Error getting user playlists')
+    return response.json()
