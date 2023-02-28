@@ -18,32 +18,6 @@ app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 Session(app)
 
 
-@app.route('/ajaxTest')
-def ajaxTest():
-    outJson = [
-        {
-            'title': 'Anime',
-            'op_title': 'Opening name',
-            'op_uri': 'spotify:link:idk'
-        },
-        {
-            'title': 'Anime',
-            'op_title': 'Opening name1',
-            'op_uri': 'spotify:link:idk1'
-        },
-        {
-            'title': 'Anime2',
-            'op_title': 'Opening name2',
-            'op_uri': 'spotify:link:idk2'
-        },
-        {
-            'title': 'Anime3',
-            'op_title': 'Opening name3',
-            'op_uri': 'spotify:track:4o1s691Qn6lUmFh1Bl28NG'
-        },
-    ]
-    return json.dumps(outJson)
-
 @app.route('/')
 def index():
     # session.clear()
@@ -225,7 +199,7 @@ def malAnimeOpList():
         params["offset"] += 25
 
     # We define a cache to avoid making too many requests to the API    
-    if session.get("mal_anime_cache", None) == None or type(session["mal_anime_cache"][0]["op"]) == type([]):
+    if session.get("mal_anime_cache", None) == None:
         session["mal_anime_cache"] = []
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:

@@ -2,8 +2,12 @@ $().ready(function() {
     let dataTable = $('#openings_table').dataTable({
         dom: 'lfrtipB',
         ajax: {
-            url: "/ajaxTest",
-            dataSrc: ""
+            url: "/mal/animeOpList",
+            dataSrc: (json) => {
+                return json.filter(function(item){
+                    return item.op_uri != null;         
+                });
+            }
         },
         stateSave: true,
         columns: [
