@@ -13,7 +13,7 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
         if session.get('spotify_access_token', False) == False:
             # print('redirected for no token')
             return redirect(url_for('index'))
-        if session['token_expiration_time'] < datetime.now():
+        if session.get('token_expiration_time') < datetime.now():
             # print('redirected for token expiration')
             refresh_auth()
 
@@ -27,11 +27,11 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
     return res
 
 def refresh_auth():
-    print (session['spotify_refresh_token'])
+    print (session.get('spotify_access_token', False))
     url = "https://accounts.spotify.com/api/token"
     body = {
         'grant_type': 'refresh_token',
-        'refresh_token': session['spotify_refresh_token'],
+        'refresh_token': session.get('spotify_access_token', False),
     }
     headers = {
         'Authorization': 'Basic ' + encode_base64(getenv('SPOT_ID') + ':' + getenv('SPOT_SECRET')),

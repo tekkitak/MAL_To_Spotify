@@ -16,16 +16,38 @@ app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 Session(app)
 
 
-
+@app.route('/ajaxTest')
+def ajaxTest():
+    outJson = [
+        {
+            'title': 'Anime',
+            'op_title': 'Opening name',
+            'op_uri': 'spotify:link:idk'
+        },
+        {
+            'title': 'Anime',
+            'op_title': 'Opening name1',
+            'op_uri': 'spotify:link:idk1'
+        },
+        {
+            'title': 'Anime2',
+            'op_title': 'Opening name2',
+            'op_uri': 'spotify:link:idk2'
+        },
+        {
+            'title': 'Anime3',
+            'op_title': 'Opening name3',
+            'op_uri': 'spotify:album:7JruDbtqHdtkxzIXBf6gjO'
+        },
+    ]
+    return json.dumps(outJson)
 
 @app.route('/')
 def index():
     # session.clear()
-    # session['token_expiration_time'] = datetime.now() - timedelta(seconds=1)
     if session.get('spotify_access_token', False) != False:
         if session['token_expiration_time'] < datetime.now():
             refresh_auth()
-    # print("expiration time:" + (session['token_expiration_time'].strftime("%m/%d/%Y, %H:%M:%S")) if 'token_expiration_time' in session else "None")
 
     return render_template('index.j2', Spotify_OAuth_url=url_for('spotifyAuth'), Spotify_CreatePlaylist_url=url_for('create_spotify_playlist'), MAL_OAuth_url=url_for('malAuth'))
 
@@ -222,3 +244,14 @@ def malAnimeOpList():
         op_list.append(anime_data)
         session["mal_anime_cache"].append(anime_data)
     return json.dumps(op_list)
+
+
+
+app.route('/spotify/processMalList', methods=['POST'])
+def process_mal_list():
+    songs = request.form.get('openings')
+    songs = json.loads(songs)
+    uris = []
+    for song in songs:
+        uris += get_song_uri(song['name'], song['artist'])
+    return uris
