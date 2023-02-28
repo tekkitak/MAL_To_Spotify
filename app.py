@@ -6,6 +6,8 @@ from os import getenv
 import json
 from datetime import datetime, timedelta
 from helper_functions import exec_request, refresh_auth, encode_base64
+import re 
+from typing import cast, Any, Union
 
 from oauth2 import OAuth2, MalOAuth2Builder
 
@@ -81,23 +83,25 @@ def spotifyAuth():
 
 
 
-def spotify_get_OAuth(code):
+def spotify_get_OAuth(code) -> Union[dict,Any]:
+    assert getenv('SPOT_ID') != None and getenv('SPOT_SECRET') != None, 'SPOT_ID or SPOT_SECRET not set'
+    spot_id:str     = cast(str,getenv('SPOT_ID'))
+    spot_secret:str = cast(str,getenv('SPOT_SECRET'))
+    
     url = "https://accounts.spotify.com/api/token"
     body = {
         'code': code,
         'grant_type': 'authorization_code',
         'redirect_uri': 'http://localhost:5000/auth/spotify',
-        'client_id': getenv('SPOT_ID'),
-        'client_secret': getenv('SPOT_SECRET'),
+        'client_id': spot_id,
+        'client_secret': spot_secret,
     }
     headers = {
-        'Authorization': 'Basic ' + encode_base64(getenv('SPOT_ID') + ':' + getenv('SPOT_SECRET')),
+        'Authorization': 'Basic ' + encode_base64(spot_id + ':' + spot_secret),
         'Content-type': 'application/x-www-form-urlencoded'
     }
-    req = exec_request(url, headers=headers, data=body, method='POST', auth=False)
+    req = cast(rq.Response, exec_request(url, headers=headers, data=body, method='POST', auth=False))
 
-    print('spotify_get_OAuth')
-    print(req.text)
     if req.status_code == 401:
         return redirect(url_for('index')) 
     return req.json()
@@ -126,18 +130,19 @@ def create_spotify_playlist():
     return redirect(url_for('index'))
 
 
-def get_spotify_user_profile():
+def get_spotify_user_profile() -> Union[dict,Any]:
     url = "https://api.spotify.com/v1/me"
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = exec_request(url, headers=headers, method='GET')
+    response = cast(rq.Response,exec_request(url, headers=headers, method='GET'))
 
     if response.status_code == 401:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))
-    return response.json() if response.status_code == 200 else False
+    if response.status_code != 200: raise Exception('Error getting user profile')
+    return response.json() 
 
 
 @app.route('/spotify/addSongs/<string:playlist_id>/<string:uris>')
@@ -157,8 +162,8 @@ def playlist_add_songs(uris, playlist_id):
     response = exec_request(url, headers=headers, data=json.dumps(data), method='POST')
     return response.json()
 
-@app.route('/spotify/getSongUri/<string:name>/<string:artist>')
-def get_song_uri(name = None, artist = None):
+@app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
+def get_song_uri(name = None, artist = None) -> Union[str,Any]:
     url = "https://api.spotify.com/v1/search"
     querystring = {
         "q":f"track:{name} artist:{artist}",
@@ -169,14 +174,16 @@ def get_song_uri(name = None, artist = None):
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
-    response = exec_request(url, headers=headers, params=querystring, method='GET')
+    response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
     if response.status_code == 401:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))
-    return response.json()['tracks']['items'][0]['uri'] if response.status_code == 200 else False
+    if response.status_code != 200: raise Exception('Error getting song uri') 
+    if response.json()['tracks']['total'] == 0: return None
+    return response.json()['tracks']['items'][0]['uri']
+   
     
     
-
 
 @app.route('/auth/mal')
 def malAuth(): 
@@ -218,7 +225,7 @@ def malAnimeOpList():
         params["offset"] += 25
 
     # We define a cache to avoid making too many requests to the API    
-    if session.get("mal_anime_cache", None) == None:
+    if session.get("mal_anime_cache", None) == None or type(session["mal_anime_cache"][0]["op"]) == type([]):
         session["mal_anime_cache"] = []
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
@@ -239,25 +246,25 @@ def malAnimeOpList():
             op_list.append(session["mal_anime_cache"][i])
             continue
 
-        anime_data = {"title": anime["node"]["title"], "op": []}
         url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
         ret = rq.get(url, params={"fields": "opening_themes"}, auth=OAuth).json()
         if ret.get("error", None) != None:
             raise Exception("animedetails", ret["error"])
 
-        anime_data["op"] = [x["text"] for x in ret.get("opening_themes", [])]
+        if ret.get("opening_themes", None) == None:
+            continue
+        for opening in ret.get("opening_themes"):
+            regex = r'"([^()\n\r\"]+)(?: \(.+\))?\\?".* by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?'
+            mtch = re.search(regex, opening["text"])
+            if mtch == None:
+                raise Exception("regex", f"regex failed to match string {opening['text']}")
+            anime_data = {
+                "title": anime["node"]["title"],
+                "op_title": mtch[1],
+                "op_artist": mtch[2],
+                "op_uri": get_song_uri(mtch[1], mtch[2])
+            }
+            op_list.append(anime_data)
+            session["mal_anime_cache"].append(anime_data)
         
-        op_list.append(anime_data)
-        session["mal_anime_cache"].append(anime_data)
     return json.dumps(op_list)
-
-
-
-app.route('/spotify/processMalList', methods=['POST'])
-def process_mal_list():
-    songs = request.form.get('openings')
-    songs = json.loads(songs)
-    uris = []
-    for song in songs:
-        uris += get_song_uri(song['name'], song['artist'])
-    return uris
