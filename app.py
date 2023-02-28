@@ -6,6 +6,7 @@ from os import getenv
 import json
 from datetime import datetime, timedelta
 from helper_functions import exec_request, refresh_auth, encode_base64
+import re 
 from typing import cast, Any, Union
 
 from oauth2 import OAuth2, MalOAuth2Builder
@@ -151,9 +152,9 @@ def get_song_uri(name = None, artist = None) -> Union[str,Any]:
         return redirect(url_for('index'))
     if response.status_code != 200: raise Exception('Error getting song uri') 
     return response.json()['tracks']['items'][0]['uri'] 
+   
     
     
-
 
 @app.route('/auth/mal')
 def malAuth(): 
@@ -216,14 +217,23 @@ def malAnimeOpList():
             op_list.append(session["mal_anime_cache"][i])
             continue
 
-        anime_data = {"title": anime["node"]["title"], "op": []}
         url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
         ret = rq.get(url, params={"fields": "opening_themes"}, auth=OAuth).json()
         if ret.get("error", None) != None:
             raise Exception("animedetails", ret["error"])
 
-        anime_data["op"] = [x["text"] for x in ret.get("opening_themes", [])]
+        for opening in ret.get("opening_themes"):
+            regex = '"([^()\n\r\"]+)(?: \(.+\))?\\" by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?'
+            mtch = re.match(regex, opening["text"])
+            if mtch == None:
+                raise Exception("regex", f"regex failed to match string {opening['text']}")
+            anime_data = {
+                "title": anime["node"]["title"],
+                "op_title": mtch[1],
+                "op_artist": mtch[2],
+                "op_uri": get_song_uri(mtch[1], mtch[2])
+            }
+            op_list.append(anime_data)
+            session["mal_anime_cache"].append(anime_data)
         
-        op_list.append(anime_data)
-        session["mal_anime_cache"].append(anime_data)
     return json.dumps(op_list)
