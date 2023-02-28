@@ -37,7 +37,7 @@ def ajaxTest():
         {
             'title': 'Anime3',
             'op_title': 'Opening name3',
-            'op_uri': 'spotify:album:7JruDbtqHdtkxzIXBf6gjO'
+            'op_uri': 'spotify:track:4o1s691Qn6lUmFh1Bl28NG'
         },
     ]
     return json.dumps(outJson)
@@ -68,6 +68,8 @@ def spotifyAuth():
     
     code = request.args.get('code')
     out = spotify_get_OAuth(code)
+    if out == None:
+        return redirect(url_for('index'))
     session['spotify_access_token'] = out['access_token']
     session['spotify_refresh_token'] = out['refresh_token']
     session['spotify_token_type'] = out['token_type']
@@ -120,6 +122,7 @@ def create_spotify_playlist():
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
     response = exec_request(url, headers=headers, data=data, method='POST')
+    print(response.text)
     return redirect(url_for('index'))
 
 
@@ -137,18 +140,21 @@ def get_spotify_user_profile():
     return response.json() if response.status_code == 200 else False
 
 
-
+@app.route('/spotify/addSongs/<string:playlist_id>/<string:uris>')
 def playlist_add_songs(uris, playlist_id):
+    uris = uris.split(',')
     url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
+    print (uris)
     data = {
         "uris": uris,
         "position": 0
         }
-    response = exec_request(url, headers=headers, data=data, method='POST')
+    
+    response = exec_request(url, headers=headers, data=json.dumps(data), method='POST')
     return response.json()
 
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>')
