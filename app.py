@@ -48,7 +48,6 @@ def spotifyAuth():
     if out == None:
         return redirect(url_for('index'))
     session['spotify_access_token'] = out['access_token']
-    session['spotify_refresh_token'] = out['refresh_token']
     session['spotify_token_type'] = out['token_type']
     session['token_expiration_time'] = datetime.now() + timedelta(seconds=out['expires_in'])
     session['spotify_refresh_token'] = out['refresh_token']

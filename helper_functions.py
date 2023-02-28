@@ -31,7 +31,7 @@ def refresh_auth() -> None:
     url = "https://accounts.spotify.com/api/token"
     body = {
         'grant_type': 'refresh_token',
-        'refresh_token': session.get('spotify_access_token', False),
+        'refresh_token': session.get('spotify_refresh_token', False),
     }
     assert getenv('SPOT_ID') != None and getenv('SPOT_SECRET') != None, 'SPOT_ID or SPOT_SECRET not set'
     spot_id:str     = cast(str,getenv('SPOT_ID'))
