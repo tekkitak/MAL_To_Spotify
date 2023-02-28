@@ -24,7 +24,7 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
     if res.status_code == 401:
         print('401 error')
         print(res.text)
-        Exception(res.json()["error"])
+        raise Exception(res.json()["error"])
     return res
 
 def refresh_auth() -> None:

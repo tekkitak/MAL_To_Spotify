@@ -134,7 +134,7 @@ def playlist_add_songs(uris, playlist_id) -> dict:
     return response.json()
 
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
-def get_song_uri(name = None, artist = None):
+def get_song_uri(name = None, artist = None) -> Union[str,Any]:
     url = "https://api.spotify.com/v1/search"
     querystring = {
         "q":f"track:{name} artist:{artist}",
@@ -149,7 +149,8 @@ def get_song_uri(name = None, artist = None):
     if response.status_code == 401:
         session['spotify_access_token'] = False
         return redirect(url_for('index'))
-    return response.json()['tracks']['items'][0]['uri'] if response.status_code == 200 else False
+    if response.status_code != 200: raise Exception('Error getting song uri') 
+    return response.json()['tracks']['items'][0]['uri'] 
     
     
 
