@@ -85,6 +85,7 @@ def spotify_get_OAuth(code) -> Union[dict,Any]:
 
 @app.route('/spotify/createPlaylist/<string:name>')
 def create_spotify_playlist( name = 'MyAnimeList openings' ):
+    print('Creating playlist: ' + name)
     user_profile = get_spotify_user_profile()
     user_id = user_profile['id']
     url = f"https://api.spotify.com/v1/users/{user_id}/playlists"

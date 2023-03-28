@@ -1,8 +1,22 @@
 $().ready(function () {
     $('#playlists-select').select2({
-        placeholder: 'Select a playlist',
+        placeholder: 'Select a playlist or create a new one',
+        tags: true,
+        createTag: function (params) {
+            var term = $.trim(params.term);
+        
+            if (term === '') {
+              return null;
+            }
+            // console.log(term);
+            return {
+              id: 'new:' + term,
+              text: term,
+              newTag: true // add additional parameters
+            }
+          }
     }).on('select2:open', () => {
-        $(".select2-results:not(:has(a))").append('<a href="#" style="padding: 6px;height: 20px;display: inline-table;">Create new item</a>');
+        // $(".select2-results:not(:has(a))").append('<a href="#" style="padding: 6px;height: 20px;display: inline-table;">Create new item</a>');
     })
 
 
@@ -75,22 +89,27 @@ $().ready(function () {
 
                     //get playlist id from select2 plugin dropdown
                     let playlist_id = $('#playlists-select').select2('data')[0].id;
-
-                    if (playlist_id == 'new') {
-                        playlist_id = prompt("Enter new playlist name");
-                        if (playlist_id == null) {
-                            return;
-                        }
-
+                    console.log(playlist_id);
+                    if (playlist_id.startsWith('new:')) {
+                        playlist_name = playlist_id.split(':')[1];
                         $.ajax({
-                            url: '/spotify/createPlaylist/' + playlist_id,
-                            type: 'POST',
+                            url: '/spotify/createPlaylist/' + playlist_name,
+                            type: 'GET',
                             success: function (data) {
+                                console.log(data);
                                 playlist_id = data;
-                            }
+                                console.log('new playlist id: ' + playlist_id);
+                            },
+                            error: function (data) {
+                                console.log(data);
+                            },
+                            async: false
                         });
-
                     }
+                    else {
+                        console.log('existing playlist id: ' + playlist_id);
+                    }
+
                     if (playlist_id == null) {
                         return;
                     }
