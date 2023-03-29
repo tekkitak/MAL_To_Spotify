@@ -104,7 +104,22 @@ $().ready(function () {
                     if (playlist_id == null) {
                         return;
                     }
-                    window.location.href = `/spotify/addSongs/${playlist_id}/${uris.join(',')}`;
+                    //maximum number of songs that can be added to a playlist in one request is 100 so we need to split the uris array into chunks of 100
+                    let chunk_size = 100;
+                    for (let i = 0; i < uris.length; i += chunk_size) {
+                        let chunk = uris.slice(i, i + chunk_size);
+                        $.ajax({
+                            url: '/spotify/addSongs/' + playlist_id + '/' + chunk.join(','),
+                            type: 'GET',
+                            success: function (data) {
+                                //TODO: print success message
+                            },
+                            error: function (data) {
+                                console.log(data);
+                            },
+                            async: false
+                        });
+                    }
                 }
             },
             {
