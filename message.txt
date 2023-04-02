@@ -1,0 +1,378 @@
+{
+  "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf/playlists?offset=0&limit=20",
+  "items": [
+    {
+      "collaborative": false,
+      "description": "Playlist transferred with SongShift",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7IDlJO7tE5wisIMg4mDxgt"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7IDlJO7tE5wisIMg4mDxgt",
+      "id": "7IDlJO7tE5wisIMg4mDxgt",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d0000b27370d7837ec8b19ce542213ec3ab67616d0000b2738a9f63e568ddcf3fb242f3a1ab67616d0000b273a49e7eb518b0d9ba1b913c15ab67616d0000b273dfdf210243811401b2e947bd",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d0000b27370d7837ec8b19ce542213ec3ab67616d0000b2738a9f63e568ddcf3fb242f3a1ab67616d0000b273a49e7eb518b0d9ba1b913c15ab67616d0000b273dfdf210243811401b2e947bd",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d0000b27370d7837ec8b19ce542213ec3ab67616d0000b2738a9f63e568ddcf3fb242f3a1ab67616d0000b273a49e7eb518b0d9ba1b913c15ab67616d0000b273dfdf210243811401b2e947bd",
+          "width": 60
+        }
+      ],
+      "name": "Dance-Electro-Good",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "Myw4NzhjY2E2YmVmYTZkOTQ2MWY2Y2FmODY5ZDk5NTQwZjdhODgyYjAy",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7IDlJO7tE5wisIMg4mDxgt/tracks",
+        "total": 10
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7IDlJO7tE5wisIMg4mDxgt"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/2XDYAm1HQfqU0awo0rij1G"
+      },
+      "href": "https://api.spotify.com/v1/playlists/2XDYAm1HQfqU0awo0rij1G",
+      "id": "2XDYAm1HQfqU0awo0rij1G",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d0000b2730ae4f4d42e4a09f3a29f64adab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273905a8f2e1bd2d03861dde7dbab67616d0000b273f2486b438645e97b523e4f90",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d0000b2730ae4f4d42e4a09f3a29f64adab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273905a8f2e1bd2d03861dde7dbab67616d0000b273f2486b438645e97b523e4f90",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d0000b2730ae4f4d42e4a09f3a29f64adab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273905a8f2e1bd2d03861dde7dbab67616d0000b273f2486b438645e97b523e4f90",
+          "width": 60
+        }
+      ],
+      "name": "Liked Songs",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MyxkMDIyM2I5ZDkxNjEzMzNlMzVjOTczNzQ2ZGZmNzQ3YzM3MWEzNzVi",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/2XDYAm1HQfqU0awo0rij1G/tracks",
+        "total": 374
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:2XDYAm1HQfqU0awo0rij1G"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/73MjaqyeKKoK9FbhlWmrOO"
+      },
+      "href": "https://api.spotify.com/v1/playlists/73MjaqyeKKoK9FbhlWmrOO",
+      "id": "73MjaqyeKKoK9FbhlWmrOO",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273d9525f27b0a9e25b1fa21230",
+          "width": 640
+        }
+      ],
+      "name": "Reggaeton ",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MywzOTI0YTQzOTIxYjQ4OTFiZjBmNzE0ZmQ0YmEwMzE3MjQ2OTFiMDBm",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/73MjaqyeKKoK9FbhlWmrOO/tracks",
+        "total": 1
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:73MjaqyeKKoK9FbhlWmrOO"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/4qFHKoaIWTmK27YyScTZYf"
+      },
+      "href": "https://api.spotify.com/v1/playlists/4qFHKoaIWTmK27YyScTZYf",
+      "id": "4qFHKoaIWTmK27YyScTZYf",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273251c28c0a3c9c4b22894f180ab67616d0000b2736c1e120cec6a10cb4fa390e1ab67616d0000b273c0403a3825b39e469e42d755",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273251c28c0a3c9c4b22894f180ab67616d0000b2736c1e120cec6a10cb4fa390e1ab67616d0000b273c0403a3825b39e469e42d755",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d0000b2730e1a21dfc9b39a3c473531f8ab67616d0000b273251c28c0a3c9c4b22894f180ab67616d0000b2736c1e120cec6a10cb4fa390e1ab67616d0000b273c0403a3825b39e469e42d755",
+          "width": 60
+        }
+      ],
+      "name": "whatever",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MTIsMmUyNDA5Y2E5YzI0NTQzYjk5NWZmMDc4ZjhhZDgwNDVjNzA5YWU1ZQ==",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/4qFHKoaIWTmK27YyScTZYf/tracks",
+        "total": 8
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:4qFHKoaIWTmK27YyScTZYf"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/3ZQhnZmpjL3SwMNmUB8tVd"
+      },
+      "href": "https://api.spotify.com/v1/playlists/3ZQhnZmpjL3SwMNmUB8tVd",
+      "id": "3ZQhnZmpjL3SwMNmUB8tVd",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d0000b2731917a0f3f4152622a040913fab67616d0000b2738265a736a1eb838ad5a0b921ab67616d0000b2739aff38f63984dd93cd1d750bab67616d0000b273df55e326ed144ab4f5cecf95",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d0000b2731917a0f3f4152622a040913fab67616d0000b2738265a736a1eb838ad5a0b921ab67616d0000b2739aff38f63984dd93cd1d750bab67616d0000b273df55e326ed144ab4f5cecf95",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d0000b2731917a0f3f4152622a040913fab67616d0000b2738265a736a1eb838ad5a0b921ab67616d0000b2739aff38f63984dd93cd1d750bab67616d0000b273df55e326ed144ab4f5cecf95",
+          "width": 60
+        }
+      ],
+      "name": "Run",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MTQsYzI2NzM3ZDM1ZDJlNjJiMDNmZGIyYjk5ZDU1Y2VlMzU5NjRiZWIyOQ==",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/3ZQhnZmpjL3SwMNmUB8tVd/tracks",
+        "total": 13
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:3ZQhnZmpjL3SwMNmUB8tVd"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/5BK4R81r5ppcqllatwevQu"
+      },
+      "href": "https://api.spotify.com/v1/playlists/5BK4R81r5ppcqllatwevQu",
+      "id": "5BK4R81r5ppcqllatwevQu",
+      "images": [],
+      "name": "Tom\u00e1\u0161",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MTMsMzhiNTkzOWYzMGE1ZWM5NmYzNWJiM2YzZWJmZjlhYTZlM2Y0YjAzMg==",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/5BK4R81r5ppcqllatwevQu/tracks",
+        "total": 7
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:5BK4R81r5ppcqllatwevQu"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/7y8Lxvh1UmQZcqd4gMq63i"
+      },
+      "href": "https://api.spotify.com/v1/playlists/7y8Lxvh1UmQZcqd4gMq63i",
+      "id": "7y8Lxvh1UmQZcqd4gMq63i",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b27362a52b31f632fbe084968ea7",
+          "width": 640
+        }
+      ],
+      "name": "Weird?",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "NCwxZWM4MzU2Y2JjY2M1Y2UxYjJmNDM4NDM5ZjEwYmQwM2RmZGZiMjgz",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/7y8Lxvh1UmQZcqd4gMq63i/tracks",
+        "total": 2
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:7y8Lxvh1UmQZcqd4gMq63i"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/055qd7kNstMQjPYPeAlCxu"
+      },
+      "href": "https://api.spotify.com/v1/playlists/055qd7kNstMQjPYPeAlCxu",
+      "id": "055qd7kNstMQjPYPeAlCxu",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://i.scdn.co/image/ab67616d0000b273f26fe2d28f3ea184db9be5a2",
+          "width": 640
+        }
+      ],
+      "name": "Ignore good music",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "NSxiMDVmMGM0NWUyOTRkYjMxODczOGRlN2NkNzhlMzVjYWRiYmM1OTJh",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/055qd7kNstMQjPYPeAlCxu/tracks",
+        "total": 26
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:055qd7kNstMQjPYPeAlCxu"
+    },
+    {
+      "collaborative": false,
+      "description": "",
+      "external_urls": {
+        "spotify": "https://open.spotify.com/playlist/1lAI3vvmQhQ1Z3FSsW4Elx"
+      },
+      "href": "https://api.spotify.com/v1/playlists/1lAI3vvmQhQ1Z3FSsW4Elx",
+      "id": "1lAI3vvmQhQ1Z3FSsW4Elx",
+      "images": [
+        {
+          "height": 640,
+          "url": "https://mosaic.scdn.co/640/ab67616d0000b2732016a5cf5888dbfd036872e6ab67616d0000b2733771989c097adbe1939e8771ab67616d0000b2735181712b3d130ca07875df76ab67616d0000b2739b9b7fe635dbe1b5173f78b3",
+          "width": 640
+        },
+        {
+          "height": 300,
+          "url": "https://mosaic.scdn.co/300/ab67616d0000b2732016a5cf5888dbfd036872e6ab67616d0000b2733771989c097adbe1939e8771ab67616d0000b2735181712b3d130ca07875df76ab67616d0000b2739b9b7fe635dbe1b5173f78b3",
+          "width": 300
+        },
+        {
+          "height": 60,
+          "url": "https://mosaic.scdn.co/60/ab67616d0000b2732016a5cf5888dbfd036872e6ab67616d0000b2733771989c097adbe1939e8771ab67616d0000b2735181712b3d130ca07875df76ab67616d0000b2739b9b7fe635dbe1b5173f78b3",
+          "width": 60
+        }
+      ],
+      "name": "Electro",
+      "owner": {
+        "display_name": "tekkitak",
+        "external_urls": {
+          "spotify": "https://open.spotify.com/user/ik4ara8834u9lwpt2nha68tpf"
+        },
+        "href": "https://api.spotify.com/v1/users/ik4ara8834u9lwpt2nha68tpf",
+        "id": "ik4ara8834u9lwpt2nha68tpf",
+        "type": "user",
+        "uri": "spotify:user:ik4ara8834u9lwpt2nha68tpf"
+      },
+      "primary_color": null,
+      "public": true,
+      "snapshot_id": "MjcsNGMyMjgzZjY4MjBlYTBlODI3ZWM0ODE3ODc2ZTljNWExNzE0NDUyNA==",
+      "tracks": {
+        "href": "https://api.spotify.com/v1/playlists/1lAI3vvmQhQ1Z3FSsW4Elx/tracks",
+        "total": 23
+      },
+      "type": "playlist",
+      "uri": "spotify:playlist:1lAI3vvmQhQ1Z3FSsW4Elx"
+    }
+  ],
+  "limit": 20,
+  "next": null,
+  "offset": 0,
+  "previous": null,
+  "total": 9
+}

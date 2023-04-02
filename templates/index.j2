@@ -4,8 +4,17 @@
 
 {% block head %}
 <script src="{{ url_for('static', filename='index.js') }}"></script>
-<link rel="stylesheet" href="//cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+
+{# <link rel="stylesheet" href="//cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css"> #}
 <script src="//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.css"/>
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.js"></script>
+
+<script src="{{ url_for('static', filename='dataTables.rowsGroup.js') }}"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -13,22 +22,20 @@
     <p>This is example page</p>
     {% if session.get('mal_oauth', 'Empty') == 'Empty' or not session['mal_oauth'].token_valid(): %}
     <p>This is OAuth <a href="{{MAL_OAuth_url}}">link</a> to auth MAL</p>
-    {% else %}
+    {% else%}
+    {% if session.get('spotify_access_token', 'Empty') != 'Empty': %}
     <p>You are authorized to MyAnimeList!</p>
     <br>
     <div class="table-enclosure">
         <table id="openings_table" class="display compact">
             <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Openings</th>
-                </tr>
             </thead>
             <tbody>
             </tbody>
         </table>
     </div>
     <br>
+    {% endif %}
     <div class="code-display">
         <code>Bearer token: {{session['mal_oauth'].get_Bearer()}}</code>
     </div>
@@ -37,9 +44,15 @@
     <p>This is OAuth <a href="{{Spotify_OAuth_url}}">link</a> to auth Spotify</p>
     {% else %}
     <p>You are already authorized to Spotify!</p>
-    <p>You can create your playlist <a href="{{Spotify_CreatePlaylist_url}}">here</a></p>
     <div class="code-display">
         <code>Bearer token: {{session.get('spotify_access_token')}}</code>
+    </div>
+    <div class="playlists">
+        <select id="playlists-select" name="playlist">
+            {% for playlist in playlists %}
+                <option value="{{playlist.id}}">{{playlist.name}}</option>
+            {% endfor %}
+        </select>
     </div>
     {% endif %}
 {% endblock %}
