@@ -20,6 +20,7 @@ class Opening(db.Model):
     opening_title = db.Column(db.String, nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
     spotify_uri = db.Column(db.String)
+    spotify_last_check = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     __table_args__ = (db.UniqueConstraint('opening_title', 'artist_id', name='_opening_uc'),)
     def __repr__(self):
         return f"<Opening#{self.id} {self.opening_title}>"

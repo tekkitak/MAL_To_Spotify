@@ -216,12 +216,12 @@ def malAnimeOpList():
     for anime in anime_list:
         if(anime['list_status']['status'] == "dropped" or 
            anime['list_status']['status'] == "plan_to_watch"):
-            print("skipping anime " + anime["node"]["title"])
+            if getenv("DEBUG") == "true": print("skipping anime " + anime["node"]["title"])
             continue
 
         if(request.args.get("completed_only", "true") == "true" and
            anime["list_status"]["status"] != "completed"):
-            print("skipping anime " + anime["node"]["title"])
+            if getenv("DEBUG") == "true": print("skipping anime " + anime["node"]["title"])
             continue
         
 
@@ -232,7 +232,8 @@ def malAnimeOpList():
             for cached in anime_cache:
                 if cached.anime_title == anime["node"]["title"]:
                     for op in cached.openings:
-                        if op.spotify_uri == None:
+                        if op.spotify_uri == None and op.spotify_last_check.timestamp()+86400 < time():
+                            op.spotify_last_check = time()
                             out_str += "Hit song without uri\n"
                             out_str += f"{time()-start}s\n"
                             op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
@@ -247,7 +248,7 @@ def malAnimeOpList():
                         })
             out_str += "Done\n"
             out_str += f"{time()-start}s\n______________________________"
-            if time()-start > .2:
+            if time()-start > .2 and getenv("DEBUG") == "true":
                 print(out_str)
             continue
 
