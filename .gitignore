@@ -1,4 +1,8 @@
 .env
 __pycache__/**
 flask_session/**
+instance/**
+archive/**
 .vscode/**
+**/*.session.sql
+

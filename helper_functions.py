@@ -1,4 +1,6 @@
 from datetime import datetime
+from database import db, Anime, Opening, Artist
+import re
 import requests as rq
 from flask import session, redirect, url_for
 from os import getenv
@@ -9,7 +11,6 @@ from typing import Union, cast
 from werkzeug.wrappers.response import Response
 
 def exec_request(url, headers=None, params=None, data=None, method='GET', auth=True) -> Union[Response, rq.Response]:
-
     if auth:
         if session.get('spotify_access_token', False) == False:
             # print('redirected for no token')
@@ -26,6 +27,25 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
         print(res.text)
         raise Exception(res.json()["error"])
     return res
+
+def parseOP(op_str: str) -> Opening:
+    try:
+        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".* by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
+        if mtch == None:
+            raise Exception("regex", f"regex failed to match string {opening['text']}")
+        title, artist_str = mtch.groups()
+        
+    except Exception as e:
+        print(e)
+        print(f"Error {op_str=}")
+        exit()
+
+    artist = Artist.query.filter_by(name=artist_str).first()
+    if artist == None:
+        artist = Artist(name=artist_str)
+        db.session.add(artist)
+        db.session.commit()
+    return Opening(opening_title=title, artist=artist)
 
 def refresh_auth() -> None:
     url = "https://accounts.spotify.com/api/token"
