@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, session
 from time import time
+from datetime import datetime
 from flask_session import Session
 from urllib.parse import urlencode
 import requests as rq
@@ -11,10 +12,12 @@ from helper_functions import exec_request, refresh_auth, encode_base64, parseOP
 from typing import cast, Any, Union
 from database import db, Anime, Opening, Artist
 import re
+from actions import register_commands
 
 from oauth2 import OAuth2, MalOAuth2Builder
 
 app = Flask(__name__)
+register_commands(app)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
@@ -142,7 +145,7 @@ def playlist_add_songs(uris, playlist_id):
     return redirect(url_for('index'))
 
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
-def get_song_uri(name = None, artist = None) -> Union[str,Any]:
+def get_song_uri(name = None, artist = None) -> Union[str,None]:
     url = "https://api.spotify.com/v1/search"
     querystring = {
         "q":f"track:{name} artist:{artist}",
@@ -233,10 +236,12 @@ def malAnimeOpList():
                 if cached.anime_title == anime["node"]["title"]:
                     for op in cached.openings:
                         if op.spotify_uri == None and op.spotify_last_check.timestamp()+86400 < time():
-                            op.spotify_last_check = time()
+                            op.spotify_last_check = datetime.now()
                             out_str += "Hit song without uri\n"
                             out_str += f"{time()-start}s\n"
                             op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
+                            db.session.commit()
+                            
 
                         out_str += "Op list append\n"
                         out_str += f"{time()-start}s\n"
