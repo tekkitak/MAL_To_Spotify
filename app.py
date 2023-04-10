@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session
 from time import time
 from datetime import datetime
 from flask_session import Session
+from flask_debugtoolbar import DebugToolbarExtension
 from urllib.parse import urlencode
 import requests as rq
 from os import getenv
@@ -22,9 +23,11 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+
 db.init_app(app)
 Session(app)
+toolbar = DebugToolbarExtension(app)
+app.debug = getenv('FLASK_DEBUG', 'False') == 'True'
 
 with app.app_context():
     db.create_all()
