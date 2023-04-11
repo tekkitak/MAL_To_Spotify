@@ -7,6 +7,15 @@ from shutil import copyfile
 from os import system
 
 def register_commands(app: Flask):
+    @app.cli.command(help='Setup python')
+    @with_appcontext
+    def setup():
+        system('pip install -r requirements.txt')
+        if input('Do you want to change .env? [y/N] ').lower() == 'y':
+            copyfile('.env', '.env.bak')
+            copyfile('example.env', '.env')
+        print('Python setup complete')
+
     @app.cli.command(help='Initialize the database')
     @with_appcontext
     def db_init():
