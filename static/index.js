@@ -15,6 +15,14 @@ $().ready(function () {
               newTag: true // add additional parameters
             }
           }
+    });
+
+    $('#show-mal-token').on('click', ()=>{
+        $('#mal-token').toggle();
+    })
+
+    $('#show-spotify-token').on('click', ()=>{
+        $('#spotify-token').toggle();
     })
 
 
