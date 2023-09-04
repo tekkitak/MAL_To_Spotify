@@ -40,6 +40,7 @@ def parseOP(op_str: str) -> Opening:
         print(f"Error {op_str=}")
         exit()
 
+    # FIXME: check if the opeing is already in the database
     artist = Artist.query.filter_by(name=artist_str).first()
     if artist == None:
         artist = Artist(name=artist_str)
