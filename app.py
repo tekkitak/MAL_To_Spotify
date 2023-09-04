@@ -266,17 +266,26 @@ def malAnimeOpList():
         try:
             anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
             if anim == None:
-                anim = Anime(anime_title=anime["node"]["title"], openings=[parseOP(x["text"]) for x in ret.get("opening_themes", [])])
+                openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
+                for op in openings:
+                    if op.spotify_uri == None:
+                        try:
+                            op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
+                        except Exception as e:
+                            print("Error: 404")
+                            print(anime["node"]["title"])
+                            print(f"{op=}")
+                            raise e
+
+                anim = Anime(anime_title=anime["node"]["title"], openings=openings)
             else:
                 anim.openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
 
             db.session.add(anim)
             db.session.commit()
         except Exception as e:
-            print("Error:259")
             print(anime["node"]["title"]) 
             print(ret.get("opening_themes", []))
-            print(f"{anim=} ")
             raise e
             db.session.rollback()
 
