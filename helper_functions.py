@@ -30,9 +30,9 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
 
 def parseOP(op_str: str) -> Opening:
     try:
-        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".* by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
+        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
         if mtch == None:
-            raise Exception("regex", f"regex failed to match string {opening['text']}")
+            raise Exception("regex", f"regex failed to match string {op_str}")
         title, artist_str = mtch.groups()
         
     except Exception as e:

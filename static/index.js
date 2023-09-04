@@ -57,7 +57,7 @@ $().ready(function () {
                 data: "op_title",
                 render: (data, type, row, meta) => {
                     if(row.op_uri == null)
-                    return data;
+                        return data;
                     return `<a href='https://open.spotify.com/track/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
                 }
             },
