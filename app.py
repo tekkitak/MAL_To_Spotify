@@ -167,7 +167,7 @@ def get_song_uri(name = None, artist = None) -> Union[str,None]:
     #     }
 
     #     response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
-    #     if response.status_code != 200: raise Exception('Error getting song uri')
+    if response.status_code != 200: raise Exception('Error getting song uri')
     if response.json()['tracks']['total'] == 0: return None
     return response.json()['tracks']['items'][0]['uri']
    
