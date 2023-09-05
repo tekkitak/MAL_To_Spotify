@@ -4,30 +4,30 @@ $().ready(function () {
         tags: true,
         createTag: function (params) {
             var term = $.trim(params.term);
-        
+
             if (term === '') {
-              return null;
+                return null;
             }
 
             return {
-              id: 'new:' + term,
-              text: term,
-              newTag: true // add additional parameters
+                id: 'new:' + term,
+                text: term,
+                newTag: true // add additional parameters
             }
-          }
+        }
     });
 
-    $('#show-mal-token').on('click', ()=>{
+    $('#show-mal-token').on('click', () => {
         $('#mal-token').toggle();
     })
 
-    $('#show-spotify-token').on('click', ()=>{
+    $('#show-spotify-token').on('click', () => {
         $('#spotify-token').toggle();
     })
 
 
     let dataTable = $('#openings_table').dataTable({
-        dom: 'lfrtipB',
+        dom: 'lfrtpB',
         ajax: {
             url: "/mal/animeOpList",
             dataSrc: (json) => {
@@ -56,7 +56,7 @@ $().ready(function () {
                 title: "Song",
                 data: "op_title",
                 render: (data, type, row, meta) => {
-                    if(row.op_uri == null)
+                    if (row.op_uri == null)
                         return data;
                     return `<a href='https://open.spotify.com/track/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
                 }
@@ -69,7 +69,7 @@ $().ready(function () {
                 title: "Include",
                 data: null,
                 render: (data, type, row) => {
-                    if(row.op_uri == null)
+                    if (row.op_uri == null)
                         return `<input type='checkbox' name='${row.op_uri}' disabled='true'>`
                     return `<input type='checkbox' name='${row.op_uri}'>`
                 }

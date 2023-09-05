@@ -24,16 +24,14 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Home</h1>
-    <p>This is example page</p>
+    <h1 class="text-center m-4">MToS</h1>
+    <p class="text-center m-2">MyAnimeList to Spotify</p>
     {% if session.get('mal_oauth', 'Empty') == 'Empty' or not session['mal_oauth'].token_valid(): %}
     <p>This is OAuth <a href="{{MAL_OAuth_url}}">link</a> to auth MAL</p>
     {% else%}
     {% if session.get('spotify_access_token', 'Empty') != 'Empty': %}
-    <p>You are authorized to MyAnimeList!</p>
-    <br>
     <div class="table-enclosure">
-        <table id="openings_table" class="display compact">
+        <table id="openings_table" class="display compact table table-hover table-bordered border-light-subtle"></table>
             <thead>
             </thead>
             <tbody>
@@ -42,6 +40,7 @@
     </div>
     <br>
     {% endif %}
+    <p>You are authorized to MyAnimeList!</p>
     <button id="show-mal-token" class="btn btn-primary">Show MAL</button>
     <div id="mal-token" class="code-display" style="display:none">
         <code>Bearer token: {{session['mal_oauth'].get_Bearer()}}</code>
