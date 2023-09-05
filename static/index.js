@@ -8,7 +8,7 @@ $().ready(function () {
             if (term === '') {
               return null;
             }
-            // console.log(term);
+
             return {
               id: 'new:' + term,
               text: term,
