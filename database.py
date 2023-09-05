@@ -18,12 +18,20 @@ class Artist(db.Model):
 class Opening(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     opening_title = db.Column(db.String, nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
-    spotify_uri = db.Column(db.String)
-    spotify_last_check = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    # __table_args__ = (db.UniqueConstraint('opening_title', 'artist_id', name='_opening_uc'),)
+    episodes = db.Column(db.String(32), nullable=False)
     def __repr__(self):
         return f"<Opening#{self.id} {self.opening_title}>"
+
+class Song(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    song_title = db.Column(db.String(255), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+    opening = db.relationship('Opening', backref='song')
+    spotify_url = db.Column(db.String(255), nullable=False)
+    votes = db.Column(db.Integer, nullable=False, default=0)
+    # __table_args__ = (db.UniqueConstraint('id', 'song_title', name='_song_uc'),)
+    def __repr__(self):
+        return f"<Song#{self.id} {self.song_title}>"
 
 class Anime(db.Model):
     id = db.Column(db.Integer, primary_key=True)
