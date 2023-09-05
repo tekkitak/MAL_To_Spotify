@@ -41,7 +41,7 @@
     <br>
     {% endif %}
     <p>You are authorized to MyAnimeList!</p>
-    <button id="show-mal-token" class="btn btn-primary">Show MAL</button>
+    <button id="show-mal-token" class="btn btn-warning">Show MAL</button>
     <div id="mal-token" class="code-display" style="display:none">
         <code>Bearer token: {{session['mal_oauth'].get_Bearer()}}</code>
     </div>
@@ -50,7 +50,7 @@
     <p>This is OAuth <a href="{{Spotify_OAuth_url}}">link</a> to auth Spotify</p>
     {% else %}
     <p>You are already authorized to Spotify!</p>
-    <button id="show-spotify-token" class="btn btn-primary">Show Spot</button>
+    <button id="show-spotify-token" class="btn btn-warning">Show Spot</button>
     <div id="spotify-token" class="code-display" style="display:none">
         <code>Bearer token: {{session.get('spotify_access_token')}}</code>
     </div>
