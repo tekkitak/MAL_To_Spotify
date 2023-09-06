@@ -4,9 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Base(declarative_base()):
-    pass
 
+Base = declarative_base()
 
 anime_openings = db.Table("anime_openings",
     Column('anime_id', Integer, ForeignKey('anime.id'), primary_key=True),
@@ -14,6 +13,7 @@ anime_openings = db.Table("anime_openings",
                           )
                         
 class Artist(Base):
+    __tablename__ = 'artist'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
     openings = relationship('Opening', backref='artist')
@@ -22,6 +22,7 @@ class Artist(Base):
         return f"<Artist#{self.id} {self.name}>"
 
 class Opening(Base):
+    __tablename__ = 'opening'
     id = Column(Integer, primary_key=True)
     opening_title = Column(String, nullable=False)
     episodes = Column(String(32), nullable=False)
@@ -29,6 +30,7 @@ class Opening(Base):
         return f"<Opening#{self.id} {self.opening_title}>"
 
 class Song(Base):
+    __tablename__ = 'song'
     id = Column(Integer, primary_key=True)
     song_title = Column(String(255), nullable=False)
     artist_id = Column(Integer, ForeignKey('artist.id'), nullable=False)
@@ -40,6 +42,7 @@ class Song(Base):
         return f"<Song#{self.id} {self.song_title}>"
 
 class Anime(Base):
+    __tablename__ = 'anime'
     id = Column(Integer, primary_key=True)
     anime_title = Column(String(255), nullable=False)
     openings = relationship('Opening', secondary=anime_openings, backref='anime')
