@@ -3,13 +3,14 @@ from time import time
 from datetime import datetime
 import json
 import requests as rq
-import requests as rq
 from flask import Blueprint, redirect, url_for, request, session
 from flask import redirect, url_for, request, session
 from model.oauth2 import MalOAuth2Builder, OAuth2
 from model.database import db, Anime
 from model.helper_functions import parseOP
 from controller.api.spotify import get_song_uri
+from sqlalchemy import select
+from sqlalchemy.orm import Session as SQLSession
 
 mal = Blueprint('mal', __name__, 
                 template_folder='templates/api/mal',
@@ -59,7 +60,9 @@ def malAnimeOpList():
         params["offset"] += 25
 
     anime_titles = [x["node"]["title"] for x in anime_list]
-    anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
+    # anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
+    anime_cache = select(Anime).where(Anime.anime_title.in_(anime_titles))
+    print(anime_cache)
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
         if(anime['list_status']['status'] == "dropped" or
@@ -109,7 +112,9 @@ def malAnimeOpList():
 
 
         try:
-            anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
+            # anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
+            anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
+            print(anim)
             if anim is None:
                 openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
                 for op in openings:
