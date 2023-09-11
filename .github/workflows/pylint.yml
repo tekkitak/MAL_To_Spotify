@@ -13,7 +13,7 @@ jobs:
       with:
         requirements-path: requirements.txt
         readme-path: README.md
-        python-version: 3.10  # python version which will lint the package
+        python-version: 3.11  # python version which will lint the package
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
