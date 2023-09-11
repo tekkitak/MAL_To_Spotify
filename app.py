@@ -7,14 +7,12 @@ import requests as rq
 from os import getenv
 import json
 from datetime import datetime, timedelta
-import re 
 from helper_functions import exec_request, refresh_auth, encode_base64, parseOP
 from typing import cast, Any, Union
-from database import db, Anime, Opening, Artist
-import re
+from database import db, Anime
 from actions import register_commands
 
-from oauth2 import OAuth2, MalOAuth2Builder
+from oauth2 import MalOAuth2Builder
 
 app = Flask(__name__)
 register_commands(app)
@@ -29,6 +27,9 @@ Session(app)
 with app.app_context():
     db.create_all()
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.j2'), 404
 
 @app.route('/')
 def index():
