@@ -1,4 +1,3 @@
-![pylint]()
 ## Spotify Playlist Generator for Anime Watchers
 
 This project aims to generate a personalized Spotify playlist for anime watchers based on their watched list on MyAnimeList.net. The generated playlist will include songs from the soundtracks of the anime shows in the user's watched list.
