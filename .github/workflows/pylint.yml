@@ -5,11 +5,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10"]
+    timeout-minutes: 10
     steps:
     - uses: Silleellie/pylint-github-action@v1
+      timeout-minutes: 10
       with:
         requirements-path: requirements.txt
         readme-path: README.md
