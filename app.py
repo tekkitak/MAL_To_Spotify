@@ -12,6 +12,7 @@ from typing import cast, Any, Union
 from database import db, Anime
 from actions import register_commands
 
+from controller.error import error
 from oauth2 import MalOAuth2Builder
 
 app = Flask(__name__)
@@ -20,16 +21,12 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+app.register_blueprint(error)
 db.init_app(app)
 Session(app)
 
 with app.app_context():
     db.create_all()
-
-@app.errorhandler(404)
-def page_not_found(error: Exception):
-    return render_template('error/404.j2'), 404
 
 @app.route('/')
 def index():
