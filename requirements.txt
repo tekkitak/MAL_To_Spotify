@@ -6,3 +6,4 @@ urllib3==1.26.8
 python-dotenv==0.20.0
 SQLAlchemy==2.0.9
 Flask-SQLAlchemy==3.0.3
+SQLAlchemy-Utils==0.38.3

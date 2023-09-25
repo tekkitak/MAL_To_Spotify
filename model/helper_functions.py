@@ -1,5 +1,5 @@
 from datetime import datetime
-from model.database import db, Anime, Opening, Artist
+from model.database import db, Opening, Artist
 import re
 import requests as rq
 from flask import session, redirect, url_for

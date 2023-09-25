@@ -18,7 +18,11 @@ def register_commands(app: Flask):
     @app.cli.command(help='Initialize the database')
     @with_appcontext
     def db_init():
-        db.create_all()
+        # db.create_all()
+        if not database_exists(SQLEngine.url):
+            # create_database(SQLEngine.url)
+            db.create_all()
+        
         click.echo('Database initialized')
     
     @app.cli.command(help='Drop the database')

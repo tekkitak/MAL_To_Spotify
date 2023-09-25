@@ -24,9 +24,6 @@ app.register_blueprint(api)
 db.init_app(app)
 Session(app)
 
-with app.app_context():
-    db.create_all()
-
 @app.route('/')
 def index():
     playlists = []
