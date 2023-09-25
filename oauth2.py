@@ -5,13 +5,12 @@ from urllib.parse import urlencode
 import requests as rq 
 from requests.auth import AuthBase
 from typing import Union
-import app
 
 class OAuth2(AuthBase):
     def __init__(self, client_id:str, client_secret:str, 
                 redirect_uri:str, oauth_url:str, token_url:str, 
                 method:str, scope:Union[str, None]=None):
-        if method == None:
+        if method == None: # type: ignore
             self.code_challenge = {'method': None, 'expire': -1}
         elif method in ['plain', 'S256']:
             self.code_challenge = {
@@ -141,7 +140,7 @@ class OAuth2(AuthBase):
             self.token_from_refresh()
         return "Bearer " + self.token['access']
     
-def MalOAuth2Builder(client_id, client_secret, redirect_url) -> OAuth2:
+def MalOAuth2Builder(client_id:str, client_secret:str, redirect_url:str) -> OAuth2:
     return OAuth2(client_id, client_secret, redirect_url, 
                 'https://myanimelist.net/v1/oauth2/authorize', 
                 'https://myanimelist.net/v1/oauth2/token', 
