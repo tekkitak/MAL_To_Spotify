@@ -13,7 +13,6 @@ from typing import cast, Any, Union
 from database import db, Anime, Opening, Artist
 import re
 from actions import register_commands
-from sqlalchemy import select
 from sqlalchemy.orm import Session as SQLSession
 
 from oauth2 import OAuth2, MalOAuth2Builder
@@ -26,10 +25,8 @@ app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 print(app.config['SQLALCHEMY_DATABASE_URI'])
 db.init_app(app)
-Session(app)
 
-with app.app_context():
-    db.create_all()
+
 
 
 @app.route('/')
@@ -216,8 +213,8 @@ def malAnimeOpList():
         params["offset"] += 25
 
     anime_titles = [x["node"]["title"] for x in anime_list]
-    # anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
-    anime_cache = select(Anime).where(Anime.anime_title.in_(anime_titles))
+    anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
+
     print(anime_cache)
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
@@ -268,8 +265,8 @@ def malAnimeOpList():
 
 
         try:
-            # anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
-            anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
+            anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
+            # anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
             print(anim)
             if anim == None:
                 openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]

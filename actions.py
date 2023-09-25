@@ -5,6 +5,12 @@ from database import db
 from os import getenv
 from shutil import copyfile
 from os import system
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy_utils import database_exists, create_database
+
+SQLEngine = create_engine( getenv('DATABASE_URL'))
+
 
 def register_commands(app: Flask):
     @app.cli.command(help='Setup python')
@@ -19,7 +25,11 @@ def register_commands(app: Flask):
     @app.cli.command(help='Initialize the database')
     @with_appcontext
     def db_init():
-        db.create_all()
+        # db.create_all()
+        if not database_exists(SQLEngine.url):
+            # create_database(SQLEngine.url)
+            db.create_all()
+        
         click.echo('Database initialized')
     
     @app.cli.command(help='Drop the database')

@@ -1,152 +1,124 @@
-from typing import List
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Table
-from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-
-class Base(DeclarativeBase):
-    pass 
-
-class Artist(Base):
+class Artist(db.Model):
     __tablename__ = 'artist'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    artist_name = db.Column(db.String(128), nullable=False)
 
-    songs: Mapped[List['Song']] = relationship(back_populates='artist')
-
-    def __repr__(self) -> str:
-        return f'<Artist {self.id}, {self.name}>'
-    
-
-anime_opening = Table(
-    "anime_opening",
-    Base.metadata,
-    Column("anime_id", Integer, ForeignKey("anime.id")),
-    Column("opening_id", Integer, ForeignKey("opening.id")),
-    Column("episodes", String(128), nullable=False),
-)    
-
-class Opening(Base):
-    __tablename__ = 'opening'
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    opening_title: Mapped[str] = mapped_column(String(128), nullable=False)
-    episodes: Mapped[str] = mapped_column(String(128), nullable=False)
-
-    songs: Mapped[List['Song']] = relationship(back_populates='opening')
-    animes: Mapped[List['Anime']] = relationship('Anime', secondary=anime_opening, back_populates='openings')
+    songs = db.relationship('Song', back_populates='artist', cascade='all, delete-orphan')
 
     def __repr__(self) -> str:
-        return f'<Opening {self.id}, {self.opening_title}, {self.episodes}>'
-    
-class Anime(Base):
+        return f'<Artist {self.id}, {self.artist_name}>'
+
+class Anime(db.Model):
     __tablename__ = 'anime'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    anime_title: Mapped[str] = mapped_column(String(128), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    anime_title = db.Column(db.String(128), nullable=False)
 
-    openings: Mapped[List['Opening']] = relationship('Opening', secondary=anime_opening, back_populates='animes')
+    openings = db.relationship('Opening', secondary='anime_opening', back_populates='animes')
 
     def __repr__(self) -> str:
         return f'<Anime {self.id}, {self.anime_title}>'
-    
-import_song = Table(
-    "import_song",
-    Base.metadata,
-    Column("import_id", Integer, ForeignKey("import.id")),
-    Column("song_id", Integer, ForeignKey("song.id")),
-)
 
-class Import(Base):
-    __tablename__ = 'import'
+class Opening(db.Model):
+    __tablename__ = 'opening'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
-    user: Mapped['User'] = relationship(back_populates='import')
-    time: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    opening_title = db.Column(db.String(128), nullable=False)
+    episodes = db.Column(db.String(128), nullable=False)
 
-    songs: Mapped[List['Song']] = relationship('Song', secondary=import_song, back_populates='imports')
+    songs = db.relationship('Song', back_populates='opening', cascade='all, delete-orphan')
+    animes = db.relationship('Anime', secondary='anime_opening', back_populates='openings')
 
     def __repr__(self) -> str:
-        return f'<Import {self.id}, {self.user}, {self.time}>'
+        return f'<Opening {self.id}, {self.opening_title}, {self.episodes}>'
 
-class Song(Base):
+class Song(db.Model):
     __tablename__ = 'song'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    song_title: Mapped[str] = mapped_column(String(128), nullable=False)
-    artist_id: Mapped[int] = mapped_column(Integer, ForeignKey('artist.id'), nullable=False)
-    artist: Mapped['Artist'] = relationship(back_populates='songs')
-    opening_id: Mapped[int] = mapped_column(Integer, ForeignKey('opening.id'), nullable=False)
-    opening: Mapped['Opening'] = relationship(back_populates='songs')
-    spotify_link: Mapped[str] = mapped_column(String(128), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    song_title = db.Column(db.String(128), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+    artist = db.relationship('Artist', back_populates='songs')
+    opening_id = db.Column(db.Integer, db.ForeignKey('opening.id'), nullable=False)
+    opening = db.relationship('Opening', back_populates='songs')
+    spotify_link = db.Column(db.String(128), nullable=False)
 
-    votes: Mapped[List['Vote']] = relationship(back_populates='song')
-    imports: Mapped[List['Import']] = relationship('Import', secondary=import_song, back_populates='songs')
+    votes = db.relationship('Vote', back_populates='song', cascade='all, delete-orphan')
+    imports = db.relationship('Import', secondary='import_song', back_populates='songs')
 
     def __repr__(self) -> str:
         return f'<Song {self.id}, {self.song_title}, {self.artist}, {self.opening}, {self.spotify_link}>'
 
-class User(Base):
+class User(db.Model):
     __tablename__ = 'user'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(128), nullable=False)
-    password: Mapped[str] = mapped_column(String(128), nullable=False)
-    myanimelist_id: Mapped[int] = mapped_column(String(length=128), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    myanimelist_id = db.Column(db.String(length=128), nullable=True)
 
-    votes: Mapped[List['Vote']] = relationship(back_populates='user')
-    oauth2s: Mapped[List['OAuth2']] = relationship(back_populates='user')
-    syncs: Mapped[List['Sync']] = relationship(back_populates='user')
-    imports: Mapped[List['Import']] = relationship(back_populates='user')
+    votes = db.relationship('Vote', back_populates='user', cascade='all, delete-orphan')
+    oauth2s = db.relationship('OAuth2', back_populates='user', cascade='all, delete-orphan')
+    syncs = db.relationship('Sync', back_populates='user', cascade='all, delete-orphan')
+    imports = db.relationship('Import', back_populates='user', cascade='all, delete-orphan')
 
     def __repr__(self) -> str:
         return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
-    
-class Vote(Base):
+
+class Vote(db.Model):
     __tablename__ = 'vote'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
-    user: Mapped['User'] = relationship(back_populates='votes')
-    song_id: Mapped[int] = mapped_column(Integer, ForeignKey('song.id'), nullable=False)
-    song: Mapped['Song'] = relationship(back_populates='votes')
-    vote: Mapped[int] = mapped_column(Integer, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='votes')
+    song_id = db.Column(db.Integer, db.ForeignKey('song.id'), nullable=False)
+    song = db.relationship('Song', back_populates='votes')
+    vote = db.Column(db.Integer, nullable=False)
 
-    def __repr__(self) -> str:
-        return f'<Vote {self.id}, {self.user}, {self.song}, {self.vote}>'
+class Import(db.Model):
+    __tablename__ = 'import'
 
-class OAuth2(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='imports')
+    time= db.Column(db.DateTime, nullable=False)
+    songs = db.relationship('Song', secondary='import_song', back_populates='imports')
+
+class OAuth2(db.Model):
     __tablename__ = 'oauth2'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
-    user: Mapped['User'] = relationship(back_populates='oauth2')
-    access_token: Mapped[str] = mapped_column(String(128), nullable=False)
-    token_type: Mapped[str] = mapped_column(String(128), nullable=False)
-    refresh_token: Mapped[str] = mapped_column(String(128), nullable=False)
-    expires_at: Mapped[int] = mapped_column(Integer, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='oauth2s')
+    provider = db.Column(db.String(128), nullable=False)
+    access_token = db.Column(db.String(128), nullable=False)
+    token_type = db.Column(db.String(128), nullable=False)
+    refresh_token = db.Column(db.String(128), nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
 
-    def __repr__(self) -> str:
-        return f'<OAuth2 {self.id}, {self.user}, {self.access_token}, {self.token_type}, {self.refresh_token}, {self.expires_at}>'
-
-
-class Sync(Base):
+class Sync(db.Model):
     __tablename__ = 'sync'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
-    user: Mapped['User'] = relationship(back_populates='sync')
-    last_sync: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
-    spotify_playlist_id: Mapped[str] = mapped_column(String(128), nullable=False)
-    spotify_oauth2_id: Mapped[int] = mapped_column(Integer, ForeignKey('oauth2.id'), nullable=False)
-    spotify_oauth2: Mapped['OAuth2'] = relationship(back_populates='sync')
-    myanimelist_oauth2_id: Mapped[int] = mapped_column(Integer, ForeignKey('oauth2.id'), nullable=False)
-    myanimelist_oauth2: Mapped['OAuth2'] = relationship(back_populates='sync')
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='syncs')
+    provider = db.Column(db.String(128), nullable=False)
+    last_synced_at = db.Column(db.DateTime, nullable=False)
 
-    def __repr__(self) -> str:
-        return f'<Sync {self.id}, {self.user}, {self.last_sync}, {self.spotify_playlist_id}, {self.spotify_oauth2}, {self.myanimelist_oauth2}>'
-        
+anime_opening = db.Table(
+    'anime_opening',
+    db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
+    db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
+    db.Column('episodes', db.String(128), nullable=False)
+)
+
+import_song = db.Table(
+    'import_song',
+    db.Column('import_id', db.Integer, db.ForeignKey('import.id'), primary_key=True),
+    db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
+)
