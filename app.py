@@ -13,6 +13,7 @@ from database import db, Anime
 from database import db, Anime, Opening, Artist, Song, Vote, Import
 from actions import register_commands
 
+from controller.error import error
 from oauth2 import MalOAuth2Builder
 
 app = Flask(__name__)
