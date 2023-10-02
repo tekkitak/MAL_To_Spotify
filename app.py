@@ -145,26 +145,25 @@ def playlist_add_songs(uris, playlist_id):
 @app.route('/spotify/getSongUri/<string:name>/<string:artist>') # type: ignore
 def get_song_uri(name = None, artist = None) -> Union[str,None]:
     url = "https://api.spotify.com/v1/search"
-    querystring = {
-        "q":f"track:{name} artist:{artist}",
-        "type":"track",
-        "limit":"1"
+    if artist == None:
+        querystring = {
+            "q":f"track:{name}",
+            "type":"track",
+            "limit":"1"
         }
+    else:
+        querystring = {
+            "q":f"track:{name} artist:{artist}",
+            "type":"track",
+            "limit":"1"
+            }
     headers = {
         "Content-Type":"application/json",
         "Authorization":session['spotify_token_type'] + ' ' + session['spotify_access_token']
         }
     response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
 
-    if response.status_code != 200: raise Exception('Error getting song uri') 
-    # if response.json()['tracks']['total'] == 0: 
-    #     querystring = {
-    #         "q":f"track:{name}",
-    #         "type":"track",
-    #         "limit":"1"
-    #     }
 
-    #     response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
     if response.status_code != 200: raise Exception('Error getting song uri')
     if response.json()['tracks']['total'] == 0: return None
     return response.json()['tracks']['items'][0]['uri']
@@ -212,11 +211,13 @@ def malAnimeOpList():
         params["offset"] += 25
 
     anime_titles = [x["node"]["title"] for x in anime_list]
-    anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
-
-    print(anime_cache)
+    # anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles)).all()
+    anime_cache = Anime.query.filter(Anime.anime_title.in_(anime_titles)).all()
+    print("Anime cache")
+    print(anime_cache) #FIXME: move to logging
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
+        # print("Testing anime: " + anime["node"]["title"]) # FIXME: move to logging
         if(anime['list_status']['status'] == "dropped" or 
            anime['list_status']['status'] == "plan_to_watch"):
             if getenv("DEBUG") == "true": print("skipping anime " + anime["node"]["title"])
@@ -254,7 +255,7 @@ def malAnimeOpList():
             out_str += "Done\n"
             out_str += f"{time()-start}s\n______________________________"
             if time()-start > .2 and getenv("DEBUG") == "true":
-                print(out_str)
+                print(out_str) # FIXME: move to logging
             continue
 
         url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
@@ -266,20 +267,24 @@ def malAnimeOpList():
         try:
             anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
             # anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
-            print(anim)
+            if anim != None:
+                print(anim) #FIXME: move to logging
+            else:
+                print("Anime not found (probably new)")
             if anim == None:
                 openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
                 for op in openings:
-                    if op.spotify_uri == None:
-                        try:
-                            op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
-                        except Exception as e:
-                            print("Error: 404")
-                            print(anime["node"]["title"])
-                            print(f"{op=}")
-                            raise e
+                    continue
+                    # if op.spotify_uri == None: # FIXME: add spotify uri (post suggestions update)
+                    #     try:
+                    #         op.spotify_uri = get_song_uri(op.opening_title, "") # FIXME: add artist name (post suggestions update)
+                    #     except Exception as e:
+                    #         print("Error: 404")
+                    #         print(anime["node"]["title"])
+                    #         print(f"{op=}")
+                    #         raise e
 
-                anim = Anime(anime_title=anime["node"]["title"], openings=openings)
+                anim = Anime(anime_title=anime["node"]["title"])
             else:
                 anim.openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
 
