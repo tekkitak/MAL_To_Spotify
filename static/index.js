@@ -29,7 +29,7 @@ $().ready(function () {
     let dataTable = $('#openings_table').dataTable({
         dom: 'lfrtpB',
         ajax: {
-            url: "/mal/animeOpList",
+            url: "/api/mal/animeOpList",
             dataSrc: (json) => {
                 return json.filter(function (item) {
                     return true
@@ -97,7 +97,7 @@ $().ready(function () {
                     if (playlist_id.startsWith('new:')) {
                         playlist_name = playlist_id.split(':')[1];
                         $.ajax({
-                            url: '/spotify/createPlaylist/' + playlist_name,
+                            url: '/api/spotify/createPlaylist/' + playlist_name,
                             type: 'GET',
                             success: function (data) {
                                 playlist_id = data;
@@ -117,7 +117,7 @@ $().ready(function () {
                     for (let i = 0; i < uris.length; i += chunk_size) {
                         let chunk = uris.slice(i, i + chunk_size);
                         $.ajax({
-                            url: '/spotify/addSongs/' + playlist_id + '/' + chunk.join(','),
+                            url: '/api/spotify/addSongs/' + playlist_id + '/' + chunk.join(','),
                             type: 'GET',
                             success: function (data) {
                                 //TODO: print success message

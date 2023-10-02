@@ -1,14 +1,14 @@
-from flask import Blueprint, redirect, url_for, request, session
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import cast, Any
-from helper_functions import exec_request, encode_base64
+import json
 from os import getenv
 import requests as rq
-import json
+from flask import Blueprint, redirect, url_for, request, session
+from helper_functions import exec_request, encode_base64
 
-spotify = Blueprint('spotify', __name__, 
-                template_folder='templates/api/spotify', 
+spotify = Blueprint('spotify', __name__,
+                template_folder='templates/api/spotify',
                 url_prefix='/spotify')
 
 @spotify.route('/auth')
@@ -18,7 +18,7 @@ def spotifyAuth():
         querystring: dict[str, Any] = {
             "client_id":getenv('SPOT_ID', None),
             "response_type":"code",
-            "redirect_uri":"http://localhost:5000/auth/spotify",
+            "redirect_uri":"http://localhost:5000/api/spotify/auth",
             "scope":"playlist-modify-private playlist-modify-public user-library-read user-library-modify"
             }
         redirectUrl: str = url + '?' + urlencode(querystring)
@@ -44,7 +44,7 @@ def spotify_get_OAuth(code: str) -> Any:
     body = {
         'code': code,
         'grant_type': 'authorization_code',
-        'redirect_uri': 'http://localhost:5000/auth/spotify',
+        'redirect_uri': 'http://localhost:5000/api/spotify/auth',
         'client_id': spot_id,
         'client_secret': spot_secret,
     }
