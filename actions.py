@@ -2,9 +2,8 @@ from flask import Flask
 import click
 from flask.cli import with_appcontext
 from database import db
-from os import getenv
+from os import getenv, system, path, makedirs
 from shutil import copyfile
-from os import system
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, create_database
@@ -42,6 +41,8 @@ def register_commands(app: Flask):
     @with_appcontext
     @click.argument('archive_name')
     def db_archive(archive_name):
+        if not path.exists('archive'):
+            makedirs('archive')
         if not archive_name.endswith('.sqlite3'):
             archive_name += '.sqlite3'
         db_url = "instance/" + getenv('DATABASE_URL')[10:]
