@@ -29,7 +29,6 @@ class Opening(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     opening_title = db.Column(db.String(128), nullable=False)
-    episodes = db.Column(db.String(128), nullable=False)
 
     songs = db.relationship('Song', back_populates='opening', cascade='all, delete-orphan')
     animes = db.relationship('Anime', secondary='anime_opening', back_populates='openings')
