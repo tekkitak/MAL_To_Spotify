@@ -1,7 +1,7 @@
 from flask import Flask
 import click
 from flask.cli import with_appcontext
-from database import db
+from model.database import db
 from os import getenv, system, path, makedirs
 from shutil import copyfile
 

@@ -5,11 +5,10 @@ import json
 import requests as rq
 import requests as rq
 from flask import Blueprint, redirect, url_for, request, session
-from oauth2 import MalOAuth2Builder
 from flask import redirect, url_for, request, session
-from oauth2 import OAuth2
-from database import db, Anime
-from helper_functions import parseOP
+from model.oauth2 import MalOAuth2Builder, OAuth2
+from model.database import db, Anime
+from model.helper_functions import parseOP
 from controller.api.spotify import get_song_uri
 
 mal = Blueprint('mal', __name__, 

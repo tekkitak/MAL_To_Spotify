@@ -3,10 +3,10 @@ from datetime import datetime
 from flask_session import Session # type: ignore -- package stub issue... 
 from os import getenv
 from datetime import datetime
-from helper_functions import refresh_auth
-from database import db
-from actions import register_commands
+from model.actions import register_commands
 
+from model.helper_functions import refresh_auth
+from model.database import db
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists

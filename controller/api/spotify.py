@@ -5,7 +5,7 @@ import json
 from os import getenv
 import requests as rq
 from flask import Blueprint, redirect, url_for, request, session
-from helper_functions import exec_request, encode_base64
+from model.helper_functions import exec_request, encode_base64
 
 spotify = Blueprint('spotify', __name__,
                 template_folder='templates/api/spotify',
