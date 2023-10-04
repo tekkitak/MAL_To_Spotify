@@ -4,6 +4,12 @@ from flask.cli import with_appcontext
 from model.database import db
 from os import getenv, system, path, makedirs
 from shutil import copyfile
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy_utils import database_exists, create_database
+
+SQLEngine = create_engine( getenv('DATABASE_URL'))
+
 
 def register_commands(app: Flask):
     @app.cli.command(help='Setup python')

@@ -22,6 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 app.register_blueprint(error)
 app.register_blueprint(api)
 db.init_app(app)
+
 Session(app)
 
 @app.route('/')
