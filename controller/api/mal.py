@@ -60,9 +60,10 @@ def malAnimeOpList():
         params["offset"] += 25
 
     anime_titles = [x["node"]["title"] for x in anime_list]
-    # anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
-    anime_cache = select(Anime).where(Anime.anime_title.in_(anime_titles))
-    print(anime_cache)
+    anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
+    # anime_cache = select(Anime).where(Anime.anime_title.in_(anime_titles))
+    # print("Anime cache")
+    # print(anime_cache) #FIXME: move to logging
     # We loop through the anime list and get the opening themes into op_list
     for anime in anime_list:
         if(anime['list_status']['status'] == "dropped" or
@@ -112,32 +113,36 @@ def malAnimeOpList():
 
 
         try:
-            # anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
-            anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
-            print(anim)
+            anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
+            # anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
+            if anim != None:
+                print(anim) #FIXME: move to logging
+            else:
+                print("Anime not found (probably new): "+anime["node"]["title"]) #FIXME: move to logging
             if anim is None:
                 openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
                 for op in openings:
-                    if op.spotify_uri is None:
-                        try:
-                            op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
-                        except Exception as error:
-                            print("Error: 404")
-                            print(anime["node"]["title"])
-                            print(f"{op=}")
-                            raise error
+                    continue
+                    # if op.spotify_uri == None: # FIXME: add spotify uri (post suggestions update)
+                    #     try:
+                    #         op.spotify_uri = get_song_uri(op.opening_title, "") # FIXME: add artist name (post suggestions update)
+                    #     except Exception as e:
+                    #         print("Error: 404")
+                    #         print(anime["node"]["title"])
+                    #         print(f"{op=}")
+                    #         raise e
 
-                anim = Anime(anime_title=anime["node"]["title"], openings=openings)
+                anim = Anime(anime_title=anime["node"]["title"])
             else:
                 anim.openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
 
             db.session.add(anim)
             db.session.commit()
-        except Exception as error:
+        except Exception as e:
             print(anime["node"]["title"]) 
             print(ret.get("opening_themes", []))
+            raise e
             db.session.rollback()
-            raise error
 
 
         for op in anim.openings:
