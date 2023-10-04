@@ -5,4 +5,5 @@ instance/**
 archive/**
 .vscode/**
 **/*.session.sql
+instance/**
 

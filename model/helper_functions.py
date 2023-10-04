@@ -1,5 +1,5 @@
 from datetime import datetime
-from model.database import db, Anime, Opening, Artist
+from model.database import db, Opening, Artist
 import re
 import requests as rq
 from flask import session, redirect, url_for
@@ -30,10 +30,11 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
 
 def parseOP(op_str: str) -> Opening:
     try:
-        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
+        # mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
+        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?(?:.*\(eps\s(\d+-\d+)\))?', op_str)
         if mtch == None:
             raise Exception("regex", f"regex failed to match string {op_str}")
-        title, artist_str = mtch.groups()
+        title, artist_str, episodes= mtch.groups()
         
     except Exception as e:
         print(e)
@@ -41,12 +42,14 @@ def parseOP(op_str: str) -> Opening:
         exit()
 
     # FIXME: check if the opeing is already in the database
-    artist = Artist.query.filter_by(name=artist_str).first()
-    if artist == None:
-        artist = Artist(name=artist_str)
-        db.session.add(artist)
-        db.session.commit()
-    return Opening(opening_title=title, artist=artist)
+    # artist = Artist.query.filter_by(artist_name=artist_str).first()
+    # if artist == None:
+    #     artist = Artist(artist_name=artist_str)
+    #     db.session.add(artist)
+    #     db.session.commit()
+    if episodes == None:
+        episodes = "All" # FIXME: add to the associative table
+    return Opening(opening_title=title)
 
 def refresh_auth() -> None:
     url = "https://accounts.spotify.com/api/token"

@@ -10,6 +10,8 @@ from model.database import db
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists
+from sqlalchemy import select
+from sqlalchemy.orm import Session as SQLSession
 
 app = Flask(__name__)
 register_commands(app)
@@ -20,10 +22,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 app.register_blueprint(error)
 app.register_blueprint(api)
 db.init_app(app)
-Session(app)
 
-with app.app_context():
-    db.create_all()
+Session(app)
 
 @app.route('/')
 def index():

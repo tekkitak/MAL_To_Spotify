@@ -4,6 +4,11 @@ from flask.cli import with_appcontext
 from model.database import db
 from os import getenv, system, path, makedirs
 from shutil import copyfile
+from sqlalchemy import create_engine
+from sqlalchemy_utils import database_exists
+
+SQLEngine = create_engine( getenv('DATABASE_URL'))
+
 
 def register_commands(app: Flask):
     @app.cli.command(help='Setup python')
@@ -18,7 +23,11 @@ def register_commands(app: Flask):
     @app.cli.command(help='Initialize the database')
     @with_appcontext
     def db_init():
-        db.create_all()
+        # db.create_all()
+        if not database_exists(SQLEngine.url):
+            # create_database(SQLEngine.url)
+            db.create_all()
+        
         click.echo('Database initialized')
     
     @app.cli.command(help='Drop the database')

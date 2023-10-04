@@ -118,11 +118,18 @@ def playlist_add_songs(uris: str, playlist_id: str):
 @spotify.route('/getSongUri/<string:name>/<string:artist>') # type: ignore
 def get_song_uri(name:str|None = None, artist:str|None = None) -> None|str:
     url = "https://api.spotify.com/v1/search"
-    querystring = {
-        "q":f"track:{name} artist:{artist}",
-        "type":"track",
-        "limit":"1"
-    }
+    if artist == None:
+        querystring = {
+            "q":f"track:{name}",
+            "type":"track",
+            "limit":"1"
+        }
+    else:
+        querystring = {
+            "q":f"track:{name} artist:{artist}",
+            "type":"track",
+            "limit":"1"
+            }
 
     token_type, access_token = session['spotify_token_type'], session['spotify_access_token'] # type: ignore - Handled below by assert
     assert token_type != None and access_token != None, 'Spotify token not set'
