@@ -1,6 +1,26 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_security.models import fsqla_v3 as fsqla
 
 db = SQLAlchemy()
+
+anime_opening = db.Table(
+    'anime_opening',
+    db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
+    db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
+    db.Column('episodes', db.String(128), nullable=False)
+)
+
+import_song = db.Table(
+    'import_song',
+    db.Column('import_id', db.Integer, db.ForeignKey('import.id'), primary_key=True),
+    db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
+)
+
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -53,14 +73,25 @@ class Song(db.Model):
     def __repr__(self) -> str:
         return f'<Song {self.id}, {self.song_title}, {self.artist}, {self.opening}, {self.spotify_link}>'
 
-class User(db.Model):
+class Role(db.Model, fsqla.FsRoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
+
+class User(db.Model, fsqla.FsUserMixin):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(128), nullable=False)
-    password = db.Column(db.String(128), nullable=False)
-    myanimelist_id = db.Column(db.String(length=128), nullable=True)
 
+    email = db.Column(db.String(255), unique=True)
+    username = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
+
+    myanimelist_id = db.Column(db.String(length=128), nullable=True)
     votes = db.relationship('Vote', back_populates='user', cascade='all, delete-orphan')
     oauth2s = db.relationship('OAuth2', back_populates='user', cascade='all, delete-orphan')
     syncs = db.relationship('Sync', back_populates='user', cascade='all, delete-orphan')
@@ -108,16 +139,3 @@ class Sync(db.Model):
     user = db.relationship('User', back_populates='syncs')
     provider = db.Column(db.String(128), nullable=False)
     last_synced_at = db.Column(db.DateTime, nullable=False)
-
-anime_opening = db.Table(
-    'anime_opening',
-    db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
-    db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
-    db.Column('episodes', db.String(128), nullable=False)
-)
-
-import_song = db.Table(
-    'import_song',
-    db.Column('import_id', db.Integer, db.ForeignKey('import.id'), primary_key=True),
-    db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
-)
