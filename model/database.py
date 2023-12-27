@@ -110,7 +110,7 @@ class Sync(db.Model):
     provider = db.Column(db.String(128), nullable=False)
     last_synced_at = db.Column(db.DateTime, nullable=False)
 
-anime_opening = db.Table(
+anime_openings = db.Table(
     'anime_opening',
     db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
     db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
