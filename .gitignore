@@ -7,4 +7,5 @@ archive/**
 **/*.session.sql
 instance/**
 virtual.env
+pymyenv
 
