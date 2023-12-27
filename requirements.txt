@@ -1,4 +1,4 @@
-Flask>=2.3.2
+Flask==2.2.3
 Flask-DebugToolbar==0.13.1
 Flask-Session==0.4.0
 requests==2.27.1
@@ -6,4 +6,5 @@ urllib3==1.26.8
 python-dotenv==0.20.0
 SQLAlchemy==2.0.9
 Flask-SQLAlchemy==3.0.3
-SQLAlchemy-Utils==0.38.3
+SQLAlchemy-Utils>=0.38.3
+Werkzeug>=2.2.0, <3.0.0
