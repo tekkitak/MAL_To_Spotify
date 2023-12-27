@@ -6,4 +6,5 @@ archive/**
 .vscode/**
 **/*.session.sql
 instance/**
-
+.gitignore
+pymyenv/
