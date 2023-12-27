@@ -17,7 +17,8 @@ class Anime(db.Model):
     __tablename__ = 'anime'
 
     id = db.Column(db.Integer, primary_key=True)
-    anime_title = db.Column(db.String(128), nullable=False)
+    mal_id = db.Column(db.Integer, nullable=True)
+    title = db.Column(db.String(128), nullable=False)
 
     openings = db.relationship('Opening', secondary='anime_opening', back_populates='animes')
 
