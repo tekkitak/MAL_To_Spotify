@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
 from typing import cast, Any
+from model.database import db, Opening, Song, Artist
 import json
 from os import getenv
 import requests as rq
@@ -116,20 +117,13 @@ def playlist_add_songs(uris: str, playlist_id: str):
     return redirect(url_for('index'))
 
 @spotify.route('/getSongUri/<string:name>/<string:artist>') # type: ignore
-def get_song_uri(name:str|None = None, artist:str|None = None) -> None|str:
+def get_spotify_song(name:str|None = None, artist:str|None = None) -> None|dict[str, str]:
     url = "https://api.spotify.com/v1/search"
-    if artist == None:
-        querystring = {
-            "q":f"track:{name}",
-            "type":"track",
-            "limit":"1"
+    querystring = {
+        "q":f"track:{name} artist:{artist}",
+        "type":"track",
+        "limit":"1"
         }
-    else:
-        querystring = {
-            "q":f"track:{name} artist:{artist}",
-            "type":"track",
-            "limit":"1"
-            }
 
     token_type, access_token = session['spotify_token_type'], session['spotify_access_token'] # type: ignore - Handled below by assert
     assert token_type != None and access_token != None, 'Spotify token not set'
@@ -137,11 +131,17 @@ def get_song_uri(name:str|None = None, artist:str|None = None) -> None|str:
         "Content-Type":"application/json",
         "Authorization": f"{token_type} {access_token}"
     }
-    response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET'))
+    response = cast(rq.Response, exec_request(url, headers=headers, params=querystring, method='GET')) #FIXME: REMOVE THIS FUCKING BULLSHIT
 
     if response.status_code != 200: raise Exception('Error getting song uri') 
     if response.json()['tracks']['total'] == 0: return None
-    return response.json()['tracks']['items'][0]['uri']
+    response = response.json()
+    ret = { 
+        "uri": response['tracks']['items'][0]['uri'],
+        "artist": response['tracks']['items'][0]['artists'][0]['name'],
+        "song_name": response['tracks']['items'][0]['name']
+     }
+    return ret
 
 @spotify.route('/playlists')
 def spotify_playlists():
@@ -157,3 +157,26 @@ def spotify_playlists():
 
     if response.status_code != 200: raise Exception('Error getting user playlists')
     return response.json()
+
+def create_spotify_song(op: Opening) -> bool:
+    """Creates song by searchin spotify for opening's title and artist.\n
+    Returns True if song was created, False otherwise"""
+    res = get_spotify_song(op.opening_title, op.opening_artist)
+    if res == None:
+        return False
+
+    artist = Artist.query.filter_by(artist_name=res['artist']).first()
+    if artist == None:
+        artist = Artist(artist_name=res['artist'])
+        db.session.add(artist)
+
+    song = Song(
+        song_title = res['song_name'],
+        spotify_link = res['uri'],
+        artist = artist,
+    )
+    db.session.add(song)
+    op.songs.append(song)
+    db.session.commit()
+    
+    return True

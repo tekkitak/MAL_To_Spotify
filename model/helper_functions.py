@@ -17,8 +17,6 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
             refresh_auth()
 
     res = rq.request(method, url, headers=headers, params=params, data=data)
-    
-    # print(f"exec: {res.status_code}")
     if res.status_code == 401:
         print('401 error')
         print(res.text)

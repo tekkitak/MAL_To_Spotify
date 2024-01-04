@@ -9,7 +9,7 @@ from flask import Blueprint, redirect, url_for, request, session
 from flask import redirect, url_for, request, session
 from model.oauth2 import MalOAuth2Builder, OAuth2
 from model.database import db, Anime, Opening, Artist, Vote, Song
-from controller.api.spotify import get_song_uri
+from controller.api.spotify import create_spotify_song 
 from sqlalchemy.orm import Session as SQLSession
 
 mal = Blueprint('mal', __name__, 
@@ -75,7 +75,7 @@ def malGenerateOPList():
                 "mal_anime_id": anime_id,
                 "op_title": op.opening_title,
                 "op_artist": op.opening_artist,
-                "op_uri": op.GetBestSong().spotify_uri if op.GetBestSong() is not None else None,
+                "op_uri": op.GetBestSong().spotify_link if op.GetBestSong() is not None else None,
             }] # type: ignore
 
     db.session.commit()
@@ -146,9 +146,12 @@ def updateAnimeOpeningsList(auth: OAuth2, anime: Anime) -> list[Any]:
             op = Opening(opening_title=title, opening_artist=artist)
             anime.openings.append(op)
             db.session.add(op)
+            db_opening = op
 
         # FIXME: Replace with magic function which asks spotify if none | gets from songs and returns uri
-
+        #find if any song exists
+        if db_opening.GetBestSong() is None:
+            create_spotify_song(db_opening)
 
 
     # Ziskam openingy pro to anime

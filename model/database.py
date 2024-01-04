@@ -50,7 +50,7 @@ class Song(db.Model):
     song_title = db.Column(db.String(128), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
     artist = db.relationship('Artist', back_populates='songs')
-    opening_id = db.Column(db.Integer, db.ForeignKey('opening.id'), nullable=False)
+    opening_id = db.Column(db.Integer, db.ForeignKey('opening.id'), nullable=True)
     opening = db.relationship('Opening', back_populates='songs')
     spotify_link = db.Column(db.String(128), nullable=False)
 
