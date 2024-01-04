@@ -1,15 +1,15 @@
 from os import getenv
 from time import time
+from typing import Optional, cast, Any
 from datetime import datetime
+import re
 import json
 import requests as rq
 from flask import Blueprint, redirect, url_for, request, session
 from flask import redirect, url_for, request, session
 from model.oauth2 import MalOAuth2Builder, OAuth2
-from model.database import db, Anime
-from model.helper_functions import parseOP
+from model.database import db, Anime, Opening, Artist, Vote, Song
 from controller.api.spotify import get_song_uri
-from sqlalchemy import select
 from sqlalchemy.orm import Session as SQLSession
 
 mal = Blueprint('mal', __name__, 
@@ -30,130 +30,152 @@ def malAuth():
     session['mal_oauth'].token_from_code(request.args.get('code'))
     return redirect(url_for('index'))
 
-@mal.route('/animeOpList')
-def malAnimeOpList():
-    op_list = []
-    anime_list = []
 
-    # Mal OAuth2
-    Oauth: None|OAuth2 = session.get("mal_oauth", None)
+@mal.route('/animeOpList')
+def malGenerateOPList():
+    Oauth: Optional[OAuth2] = cast(Optional[OAuth2], session.get("mal_oauth", None))
     if Oauth is None:
         return redirect("malAuth")
 
-    # Gets users anime list
-    url = "https://api.myanimelist.net/v2/users/@me/animelist"
+    # output json
+    json_out: list[dict[str, str]] = []
+
+    # Get user anime list 
+    anime_list = getAnimeList(Oauth)
+
+    # Find openings from db, if fails find from api
+    for anime_data in anime_list:
+        anime_status: str = anime_data['status_data']['status'] # type: ignore
+        anime_title: str = anime_data['title'] # type: ignore
+        anime_id: int = int(anime_data['id']) # type: ignore
+
+        comp_only: bool = request.args.get("completed_only", "true") == "true"
+        if anime_status in ["dropped", "plan_to_watch"]:
+            continue
+        if comp_only and anime_status != "completed":
+            continue
+
+        cached: Anime = Anime.query.filter_by(title=anime_title).one_or_none() # type: ignore
+        anime: Anime
+        if cached is None:
+            anime = Anime(title=anime_title, mal_id=anime_id)
+        else:
+            anime = cast(Anime, cached) # type: ignore
+        ## debug print...
+        print(anime.openings)
+        print(anime.title)
+        print("")
+        ## End of debug print
+        updateAnimeOpeningsList(Oauth, anime)
+        db.session.add(anime)
+
+        for op in anime.openings: # type: ignore
+            json_out += [{
+                "title": anime_title,
+                "mal_anime_id": anime_id,
+                "op_title": op.opening_title,
+                "op_artist": op.opening_artist,
+                "op_uri": op.GetBestSong().spotify_uri if op.GetBestSong() is not None else None,
+            }] # type: ignore
+
+    db.session.commit()
+    # { 
+    #     "title": cached.anime_title,
+    #     "op_title": op.opening_title,
+    #     "op_artist": op.artist.name,
+    #     "op_uri": op.spotify_uri
+    #  }
+    return json.dumps(json_out)
+
+AnimeData = dict[str, str|int]
+def getAnimeList(auth: OAuth2) -> list[AnimeData]:
+    """Gets the users anime list from MAL api"""
+    URL: str = "https://api.myanimelist.net/v2/users/@me/animelist"
+    anime_list: list[AnimeData] = []
+
     params: dict[str, str|int] = {
         'fields': 'list_status',
         "limit": 25,
         "offset": 0
     }
     while True:
-        ret = rq.get(url, params, auth=Oauth, timeout=150).json()
+        ret = rq.get(URL, params, auth=auth, timeout=150).json()
 
         if ret.get("error", None) is not None:
             raise Exception("animelist", ret["error"])
 
-        anime_list += ret["data"]
+        for row in ret["data"]:
+            anime_list.append({
+                "id": row["node"]["id"],
+                "title": row["node"]["title"],
+                "status_data": row["list_status"],
+            })
 
         if ret["paging"].get("next", None) is None:
             break
-        params["offset"] += 25
+        params["offset"] += 25 # type: ignore / We know offset is always number
+    return anime_list
 
-    anime_titles = [x["node"]["title"] for x in anime_list]
-    anime_cache = Anime.query.where(Anime.anime_title.in_(anime_titles))
-    # anime_cache = select(Anime).where(Anime.anime_title.in_(anime_titles))
-    # print("Anime cache")
-    # print(anime_cache) #FIXME: move to logging
-    # We loop through the anime list and get the opening themes into op_list
-    for anime in anime_list:
-        if(anime['list_status']['status'] == "dropped" or
-           anime['list_status']['status'] == "plan_to_watch"):
-            if getenv("DEBUG") == "true": print("skipping anime " + anime["node"]["title"])
-            continue
+def updateAnimeOpeningsList(auth: OAuth2, anime: Anime) -> list[Any]:
+    """
+    Gets the openings for the anime from MAL api and creates them in the DB
 
-        if(request.args.get("completed_only", "true") == "true" and
-           anime["list_status"]["status"] != "completed"):
-            if getenv("DEBUG") == "true": print("skipping anime " + anime["node"]["title"])
-            continue
-     
+    auth
+        OAuth2 object for MAL
+    
+    anime
+        Anime object to get openings for (needs id set)
+    """
+    anime_id = int(anime.mal_id)
+    assert anime_id is not None and type(anime_id) is int, f"Invalid Anime id, {anime_id=} | {type(anime_id)}"
 
-        if anime["node"]["title"] in [x.anime_title for x in anime_cache]:
-            out_str = "______________________________\n"
-            out_str += f" >> {anime['node']['title']} <<\n"
-            start = time()
-            for cached in anime_cache:
-                if cached.anime_title == anime["node"]["title"]:
-                    for op in cached.openings:
-                        if op.spotify_uri == None and op.spotify_last_check.timestamp()+86400 < time():
-                            op.spotify_last_check = datetime.now()
-                            out_str += "Hit song without uri\n"
-                            out_str += f"{time()-start}s\n"
-                            op.spotify_uri = get_song_uri(op.opening_title, op.artist.name)
-                            db.session.commit()
-                      
-
-                        out_str += "Op list append\n"
-                        out_str += f"{time()-start}s\n"
-                        op_list.append({
-                            "title": cached.anime_title,
-                            "op_title": op.opening_title,
-                            "op_artist": op.artist.name,
-                            "op_uri": op.spotify_uri
-                        })
-            out_str += "Done\n"
-            out_str += f"{time()-start}s\n______________________________"
-            if time()-start > .2 and getenv("DEBUG") == "true":
-                print(out_str)
-            continue
-
-        url = f"https://api.myanimelist.net/v2/anime/{anime['node']['id']}"
-        ret = rq.get(url, params={"fields": "opening_themes"}, auth=Oauth, timeout=500).json()
-        if ret.get("error", None) is not None:
-            raise Exception("animedetails", ret["error"])
+    URL: str = f"https://api.myanimelist.net/v2/anime/{anime_id}"
+    params = {
+        "fields": "opening_themes"
+    }
+    ret = rq.get(URL, params=params, auth=auth, timeout=500).json()
+    if ret.get("error", None) is not None:
+        raise Exception("getAnimeOpeningList: ", ret["error"])
 
 
-        try:
-            anim = Anime.query.filter_by(anime_title=anime["node"]["title"]).one_or_none()
-            # anim = select(Anime).where(Anime.anime_title == anime["node"]["title"])
-            if anim != None:
-                print(anim) #FIXME: move to logging
-            else:
-                print("Anime not found (probably new): "+anime["node"]["title"]) #FIXME: move to logging
-            if anim is None:
-                openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
-                for op in openings:
-                    continue
-                    # if op.spotify_uri == None: # FIXME: add spotify uri (post suggestions update)
-                    #     try:
-                    #         op.spotify_uri = get_song_uri(op.opening_title, "") # FIXME: add artist name (post suggestions update)
-                    #     except Exception as e:
-                    #         print("Error: 404")
-                    #         print(anime["node"]["title"])
-                    #         print(f"{op=}")
-                    #         raise e
+    openings: list[tuple[str,str,str]] = [parseOpStr(op_theme["text"]) for op_theme in ret.get("opening_themes", [])]
+    for title, artist, _ in openings:
+        db_opening = Opening.query.filter_by(opening_title=title, opening_artist=artist).one_or_none()
 
-                anim = Anime(anime_title=anime["node"]["title"])
-            else:
-                anim.openings = [parseOP(x["text"]) for x in ret.get("opening_themes", [])]
+        if db_opening is None:
+            op = Opening(opening_title=title, opening_artist=artist)
+            anime.openings.append(op)
+            db.session.add(op)
 
-            db.session.add(anim)
-            db.session.commit()
-        except Exception as e:
-            print(anime["node"]["title"]) 
-            print(ret.get("opening_themes", []))
-            raise e
-            db.session.rollback()
+        # FIXME: Replace with magic function which asks spotify if none | gets from songs and returns uri
 
 
-        for op in anim.openings:
-            anime_data = {
-                    "title": anime["node"]["title"],
-                    "op_title": op.opening_title,
-                    "op_artist": op.artist.name,
-                    "op_uri": op.spotify_uri
-            }
 
-            op_list.append(anime_data)
+    # Ziskam openingy pro to anime
+    return []
 
 
-    return json.dumps(op_list)
+def parseOpStr(op_str: str) -> tuple[str, str, str]:
+    """
+    Parse the opening string into a tuple of (title, artist, episodes)
+
+    op_str 
+        The string to parse
+
+    --------------------------------------------
+    returns
+        A tuple of (title, artist, episodes)
+    """
+    title: str
+    artist: str
+    episodes: str
+
+    try:
+        # Black magicry regex for parsing the opening string
+        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?(?:.*\(eps\s(\d+-\d+)\))?', op_str)
+        if mtch == None:
+            raise Exception("regex", f"regex failed to match string {op_str}")
+        title, artist, episodes = mtch.groups()
+    except Exception as e:
+        raise Exception("regex", f"regex failed to match string {op_str}") from e
+    return (title, artist, episodes)

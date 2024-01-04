@@ -36,7 +36,12 @@ class Opening(db.Model):
     animes = db.relationship('Anime', secondary='anime_opening', back_populates='openings')
 
     def __repr__(self) -> str:
-        return f'<Opening {self.id}, {self.opening_title}, {self.episodes}>'
+        return f'<Opening {self.id}, {self.opening_title}>'
+
+    def GetBestSong(self) -> 'Song | None':
+        if len(self.songs) == 0:
+            return None
+        return max(self.songs, key=lambda song: sum(vote.vote for vote in song.votes))
 
 class Song(db.Model):
     __tablename__ = 'song'
@@ -115,7 +120,7 @@ anime_openings = db.Table(
     'anime_opening',
     db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
     db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
-    db.Column('episodes', db.String(128), nullable=False)
+    db.Column('episodes', db.String(128), nullable=True)
 )
 
 import_song = db.Table(
