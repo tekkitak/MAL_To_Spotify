@@ -22,3 +22,8 @@
     padding: 0;
     margin: 0;
 }
+
+body{
+    background-image: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('/static/images/background_sakura_city.png');
+    background-size: cover;
+}

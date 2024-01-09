@@ -75,8 +75,8 @@ $().ready(function () {
                 data: null,
                 render: (data, type, row) => {
                     if (row.op_uri == null)
-                        return `<input type='checkbox' name='${row.op_uri}' disabled='true'>`
-                    return `<input type='checkbox' name='${row.op_uri}'>`
+                        return `<input type='checkbox' class='form-check-input border border-danger' name='${row.op_uri}' disabled='true'>`
+                    return `<input type='checkbox' class='form-check-input border border-primary' name='${row.op_uri}'>`
                 }
             }
         ],
