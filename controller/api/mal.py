@@ -72,6 +72,7 @@ def malGenerateOPList():
         for op in anime.openings: # type: ignore
             json_out += [{
                 "title": anime_title,
+                "anime_id": anime.id,
                 "mal_anime_id": anime_id,
                 "op_title": op.opening_title,
                 "op_artist": op.opening_artist,

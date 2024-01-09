@@ -19,6 +19,7 @@ class Anime(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mal_id = db.Column(db.Integer, nullable=True)
     title = db.Column(db.String(128), nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=True)
 
     openings = db.relationship('Opening', secondary='anime_opening', back_populates='animes')
 
@@ -31,6 +32,7 @@ class Opening(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     opening_title = db.Column(db.String(128), nullable=False)
     opening_artist = db.Column(db.String(128), nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=True)
 
     songs = db.relationship('Song', back_populates='opening', cascade='all, delete-orphan')
     animes = db.relationship('Anime', secondary='anime_opening', back_populates='openings')

@@ -56,9 +56,13 @@ $().ready(function () {
                 title: "Song",
                 data: "op_title",
                 render: (data, type, row, meta) => {
+                    out = `<div class='popup d-flex flex-row justify-content-between'>`
+                    button = `<button class='btn btn-sm btn-primary' onclick='popup-${row.anime_id}'>Change</button>`
                     if (row.op_uri == null)
-                        return data;
-                    return `<a href='https://open.spotify.com/track/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
+                        out += data
+                    else
+                        out += `<a href='https://open.spotify.com/track/${row.op_uri.split(':').slice(-1)}' target='_blank'>${data}</a>`
+                    return out + button + `</div>`
                 }
             },
             {
