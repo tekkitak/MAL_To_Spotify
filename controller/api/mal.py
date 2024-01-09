@@ -66,7 +66,11 @@ def malGenerateOPList():
         print(anime.title)
         print("")
         ## End of debug print
-        updateAnimeOpeningsList(Oauth, anime)
+
+
+        #TODO: Add last updated check
+        if len(anime.openings) == 0: #FIXME: This is not correct pls fix this if you see this, I did this from desperation, it was awfully slow and now is 11pm and I want to sleep, so don't judge me
+            updateAnimeOpeningsList(Oauth, anime)
         db.session.add(anime)
 
         for op in anime.openings: # type: ignore

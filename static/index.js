@@ -48,6 +48,7 @@ $().ready(function () {
                 data: "op_uri",
             },
             {
+                // TODO: add force update button
                 title: 'Name',
                 name: 'first',
                 data: "title"
