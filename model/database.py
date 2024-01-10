@@ -1,6 +1,8 @@
+# type: ignore
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+DB_VER = 1.0
 
 class Artist(db.Model):
     __tablename__ = 'artist'
