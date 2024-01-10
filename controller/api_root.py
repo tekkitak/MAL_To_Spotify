@@ -10,7 +10,7 @@ api.register_blueprint(spotify)
 api.register_blueprint(mal)
 
 @api.route('/clear')
-def SessionClea():
+def SessionClear():
     if current_app.config["ENV"] != "development":
         return " "
     session.clear()

@@ -159,31 +159,36 @@ $().ready(function () {
 
     $('body').on('click', '.popup-btn', function () {
         console.log('clicked');
-        //create a popup with selection of songs from spotify (get from our api) and an input field submitting your own link
         let id = $(this).attr('id').split('-')[2];
         let row = dataTable.fnGetData($(this).closest('tr'));
-        let popup = `<div class='popup-content'>`;
-        popup += `<div class='popup-header'>`;
-        popup += `<h3>${row.title}</h3>`;
-        popup += `<h5>${row.op_title}</h5>`;
-        popup += `<button id='popup-close-btn' class='btn btn-close'>Close</button>`; // Add this line
-        popup += `</div>`;
-        popup += `<div class='popup-body'>`;
-        popup += `<div class='popup-body-left'>`;
-        popup += `<iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300' height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>`;
-        popup += `</div>`;
-        popup += `<div class='popup-body-right'>`;
-        popup += `<h4>Search for song</h4>`;
-        popup += `<input type='text' class='form-control' id='popup-search-input' placeholder='Search for song'>`;
-        popup += `<div id='popup-search-results'></div>`;
-        popup += `<h4>Or submit your own link</h4>`;
-        popup += `<input type='text' class='form-control' id='popup-link-input' placeholder='Spotify link'>`;
-        popup += `</div>`;
-        popup += `</div>`;
-        popup += `<div class='popup-footer'>`;
-        popup += `<button id='popup-submit-btn' class='btn btn-primary'>Submit</button>`;
-        popup += `</div>`;
-        popup += `</div>`;
+        let popup = `
+                    <div class='popup-content'>
+                        <div class='popup-header'>
+                            <div class='popup-header-left'>
+                                <h3>${row.title}</h3>
+                                <h5>${row.op_title}</h5>
+                            </div>  
+                            <div class='popup-header-right'>
+                                <button id='popup-close-btn' class='btn btn-close'>Close</button>
+                            </div>
+                        </div>
+                    <div class='popup-body'>
+                        <div class='popup-body-left'>
+                            <iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300' 
+                            height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>
+                        </div>
+                        <div class='popup-body-right'>
+                            <h4>Search for song</h4>
+                            <input type='text' class='form-control' id='popup-search-input' placeholder='Search for song'>
+                            <div id='popup-search-results'></div>
+                                <h4>Or submit your own link</h4>
+                                <input type='text' class='form-control' id='popup-link-input' placeholder='Spotify link'>
+                            </div>
+                        </div>
+                        <div class='popup-footer'>
+                            <button id='popup-submit-btn' class='btn btn-primary'>Submit</button>
+                        </div>
+                    </div>`;
         $('#popup').html(popup);
         $('#popup').show();
 
