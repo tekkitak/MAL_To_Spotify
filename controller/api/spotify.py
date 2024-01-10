@@ -164,6 +164,7 @@ def create_spotify_song(op: Opening) -> bool:
     res = get_spotify_song(op.opening_title, op.opening_artist)
     if res == None:
         return False
+    res = cast(dict[str, str], res)
 
     artist = Artist.query.filter_by(artist_name=res['artist']).first()
     if artist == None:
