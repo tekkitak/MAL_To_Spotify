@@ -162,7 +162,7 @@ def create_spotify_song(op: Opening) -> bool:
     """Creates song by searchin spotify for opening's title and artist.\n
     Returns True if song was created, False otherwise"""
     res = get_spotify_song(op.opening_title, op.opening_artist)
-    if res == None:
+    if res is None:
         return False
     res = cast(dict[str, str], res)
 
@@ -176,6 +176,7 @@ def create_spotify_song(op: Opening) -> bool:
         spotify_link = res['uri'],
         artist = artist,
     )
+
     db.session.add(song)
     op.songs.append(song)
     db.session.commit()
