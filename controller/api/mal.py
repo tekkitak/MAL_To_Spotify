@@ -68,10 +68,10 @@ def malGenerateOPList():
         ## End of debug print
 
         # Check if anime is new or last updated more than a week ago
-        check_date: float = (datetime.now() - timedelta(weeks=1)).timestamp()
+        check_date: datetime = datetime.now() - timedelta(weeks=1)
         if anime.last_updated is None or anime.last_updated < check_date:
             updateAnimeOpeningsList(Oauth, anime)
-            anime.last_updated = floor(datetime.now().timestamp())
+            anime.last_updated = datetime.now()
         db.session.add(anime)
 
         for op in anime.openings: # type: ignore
