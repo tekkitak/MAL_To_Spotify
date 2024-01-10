@@ -1,7 +1,7 @@
 from os import getenv
-from time import time
+from math import floor
 from typing import Optional, cast, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 import json
 import requests as rq
@@ -67,10 +67,11 @@ def malGenerateOPList():
         print("")
         ## End of debug print
 
-
-        #TODO: Add last updated check
-        if len(anime.openings) == 0: #FIXME: This is not correct pls fix this if you see this, I did this from desperation, it was awfully slow and now is 11pm and I want to sleep, so don't judge me
+        # Check if anime is new or last updated more than a week ago
+        check_date: float = (datetime.now() - timedelta(weeks=1)).timestamp()
+        if anime.last_updated is None or anime.last_updated < check_date:
             updateAnimeOpeningsList(Oauth, anime)
+            anime.last_updated = floor(datetime.now().timestamp())
         db.session.add(anime)
 
         for op in anime.openings: # type: ignore
