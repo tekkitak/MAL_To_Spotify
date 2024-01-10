@@ -136,7 +136,7 @@ def get_spotify_song(name:str|None = None, artist:str|None = None) -> None|dict[
     if response.status_code != 200: raise Exception('Error getting song uri') 
     if response.json()['tracks']['total'] == 0: return None
     response = response.json()
-    ret = { 
+    ret = {
         "uri": response['tracks']['items'][0]['uri'],
         "artist": response['tracks']['items'][0]['artists'][0]['name'],
         "song_name": response['tracks']['items'][0]['name']

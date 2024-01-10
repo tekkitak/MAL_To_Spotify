@@ -16,7 +16,18 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
             # print('redirected for token expiration')
             refresh_auth()
 
-    res = rq.request(method, url, headers=headers, params=params, data=data)
+    i: int = 0
+    while True:
+        try:
+            res = rq.request(method, url, headers=headers, params=params, data=data, timeout=2)
+        except Exception as _:
+            print("Failed to connect to spotify, retrying...")
+            if i > 10:
+                raise Exception("Failed to connect to spotify after 10 retries")
+            i += 1
+            continue
+        break 
+
     if res.status_code == 401:
         print('401 error')
         print(res.text)
