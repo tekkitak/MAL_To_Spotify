@@ -75,7 +75,7 @@ $().ready(function () {
                 data: null,
                 render: (data, type, row) => {
                     if (row.op_uri == null)
-                        return `<input type='checkbox' class='form-check-input border border-danger' name='${row.op_uri}' disabled='true'>`
+                        return `<input type='checkbox' class='form-check-input border border-danger disabled bg-danger-subtle' name='${row.op_uri}' disabled='true'>`
                     return `<input type='checkbox' class='form-check-input border border-primary' name='${row.op_uri}'>`
                 }
             }
@@ -158,56 +158,75 @@ $().ready(function () {
 
 
     $('body').on('click', '.popup-btn', function () {
-        console.log('clicked');
         let id = $(this).attr('id').split('-')[2];
         let row = dataTable.fnGetData($(this).closest('tr'));
+        if (row.op_uri == null) {
+            row.op_uri = '';
+            row.op_title = '';
+            row.op_artist = '';
+        }
         let popup = `
-                    <div class='popup-content'>
-                        <div class='popup-header'>
+                    <div class='popup-content w-100'>
+                        <div class='popup-header d-flex w-100 justify-content-between'>
                             <div class='popup-header-left'>
                                 <h3>${row.title}</h3>
                                 <h5>${row.op_title}</h5>
                             </div>  
-                            <div class='popup-header-right'>
-                                <button id='popup-close-btn' class='btn btn-close'>Close</button>
+                            <div class='popup-header-right align-self-right'>
+                                <input type='button' class='btn btn-sm btn-danger' id='popup-close-btn' value='Close'>
                             </div>
                         </div>
                     <div class='popup-body'>
-                        <div class='popup-body-left'>
-                            <iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300' 
-                            height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>
-                        </div>
-                        <div class='popup-body-right'>
-                            <h4>Search for song</h4>
-                            <input type='text' class='form-control' id='popup-search-input' placeholder='Search for song'>
-                            <div id='popup-search-results'></div>
-                                <h4>Or submit your own link</h4>
-                                <input type='text' class='form-control' id='popup-link-input' placeholder='Spotify link'>
+                        <div class='popup-body-top d-flex'>
+                            <div class='popup-body-left'>`;
+                                if (row.op_uri == '') { //TODO: add custom anime-themed image
+                                    popup += `<img src='/static/error_img.jpg' alt='Not found image' width="300px">`;
+                                } else {
+                                    popup+=`<iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300'
+                                    height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>`;
+                                }
+                                popup+=`</div>
+                            <div class='popup-body-right'>
+                                <ul>
+                                    <li>asdfasdf</li>
+                                    <li>asdfasdf</li>
+                                    <li>asdfasdf</li>
+                                </ul>
                             </div>
                         </div>
-                        <div class='popup-footer'>
-                            <button id='popup-submit-btn' class='btn btn-primary'>Submit</button>
+
+                        <div class='popup-body-bottom'>
                         </div>
-                    </div>`;
+
+                        <div class='popup-footer'>
+                            <div class='song-submit input-group mb-3'>
+                                <span class='input-group-text'>Submit your own link</span>
+                                <div class='form-floating'>
+                                    <input type='text' class='form-control' id='popup-link-input' placeholder='Spotify link'>
+                                    <label for='popup-link-input'>Spotify link</label>
+                                </div>
+                                <button id='popup-submit-btn' class='btn btn-primary input-group-text'>Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                    `;
         $('#popup').html(popup);
         $('#popup').show();
 
         $('#popup-submit-btn').on('click', () => {
             let link = $('#popup-link-input').val();
-            if (link != '') {
-                $.ajax({
-                    url: '/api/mal/updateOp/' + id + '/' + link,
-                    type: 'GET',
-                    success: function (data) {
-                        $('#popup').hide();
-                        dataTable.fnReloadAjax();
-                    },
-                    error: function (data) {
-                        console.log(data);
-                    },
-                    async: false
-                });
-            }
+            $.ajax({
+                url: '/api/mal/updateOp/' + id + '/' + link,
+                type: 'GET',
+                success: function (data) {
+                    $('#popup').hide();
+                    dataTable.fnReloadAjax();
+                },
+                error: function (data) {
+                    console.log(data);
+                },
+                async: false
+            });
         });
 
         $('#popup-search-input').on('keyup', () => {
