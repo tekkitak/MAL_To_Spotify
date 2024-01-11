@@ -184,3 +184,19 @@ def create_spotify_song(op: Opening) -> bool:
     db.session.commit()
     
     return True
+
+@spotify.route('/getSongInfo/<string:spotify_uri>')
+def get_song_info(spotify_uri: str):
+    url = f"https://api.spotify.com/v1/tracks/{spotify_uri.split(':')[2]}"
+
+    token_type, access_token = session['spotify_token_type'], session['spotify_access_token']
+    assert token_type != None and access_token != None, 'Spotify token not set'
+
+    headers = {
+        "Content-Type":"application/json",
+        "Authorization": f"{token_type} {access_token}"
+    }
+
+    response = cast(rq.Response,exec_request(url, headers=headers, method='GET'))
+    if response.status_code != 200: raise Exception('Error getting song info')
+    return response.json()
