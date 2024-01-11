@@ -11,8 +11,6 @@ from model.version_control import VersionControl
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists
-from sqlalchemy import select
-from sqlalchemy.orm import Session as SQLSession
 
 app = Flask(__name__)
 register_commands(app)
