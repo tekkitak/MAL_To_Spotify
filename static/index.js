@@ -58,7 +58,7 @@ $().ready(function () {
                 data: "op_title",
                 render: (data, type, row, meta) => {
                     out = `<div class='popup d-flex flex-row justify-content-between'>`
-                    button = `<button id='popup-btn-${row.anime_id}' class='btn btn-sm btn-primary popup-btn'>Change</button>`
+                    button = `<button id='popup-btn-${row.anime_id}' class='btn btn-sm btn-outline-primary popup-btn'>Change</button>`
                     if (row.op_uri == null)
                         out += data
                     else
