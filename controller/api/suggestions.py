@@ -1,7 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from model.database import db, Song, Anime, Vote, Opening, Artist
 import json
 from controller.api.spotify import get_song_info
+from urllib.parse import unquote
 
 
 suggestions = Blueprint('suggestions', __name__, 
@@ -14,12 +15,28 @@ def GetSuggestions(opening_id: int):
     opening = Opening.query.filter_by(id=opening_id).first()
     if opening == None:
         return 'Opening not found', 404
-    return json.dumps(opening.songs, default=lambda x: x.__dict__)
+    print(opening)
+    out: list[dict[str, str | int]] = []  # Explicitly define the types of dictionary keys and values
+    for song in opening.songs:
+        out.append({
+            'song_title': song.song_title,
+            'artist': song.artist.artist_name,
+            'spotify_link': song.spotify_link,
+            'votes': sum(vote.vote for vote in song.votes)
+        })
+    return json.dumps(out), 200
 
-
-@suggestions.route('/addSuggestion/<int:opening_id>/<string:spotify_uri>')
-def AddSuggestion(opening_id: int, spotify_uri: str):
+@suggestions.route('/addSuggestion')
+def AddSuggestion():
+    if request.args.get('spotify_uri', None) == None or request.args.get('opening_id', None) == None:
+        print(request.args)
+        return 'No spotify uri or opening id provided', 400
+    spotify_uri:str = request.args.get('spotify_uri', None)
+    opening_id:int = int(request.args.get('opening_id', None))
     opening = Opening.query.filter_by(id=opening_id).first()
+
+
+    #check if opening exists
     if opening == None:
         return 'Opening not found', 404
     song = Song.query.filter_by(spotify_link=spotify_uri).first()
@@ -30,22 +47,22 @@ def AddSuggestion(opening_id: int, spotify_uri: str):
 
     if res is None:
         return 'Song not found', 404
-    res = json.loads(res)
     
     #check if artist exists
-    artist = Artist.query.filter_by(artist_name=res['artist']).first()
+    artist = Artist.query.filter_by(artist_name=res['album']['artists'][0]['name']).first()
     if artist == None:
         #create artist
-        artist = Artist(artist_name=res['artist'])
+        artist = Artist(artist_name=res['album']['artists'][0]['name'])
         db.session.add(artist)
     
     #if spotify uri is link, extract uri
-    if spotify_uri.startswith('https://open.spotify.com/'):
-        spotify_uri = extractSpotifyUri(spotify_uri)
+    if spotify_uri.startswith('https:'):
+        spotify_uri = extractSpotifyUri(unquote(spotify_uri))
 
     #create song
+    print(f"Creating song {res['name']} by {res['album']['artists'][0]['name']}")
     song = Song(
-        song_title = res['song_name'],
+        song_title = res['name'],
         spotify_link = spotify_uri,
         artist = artist,
     )

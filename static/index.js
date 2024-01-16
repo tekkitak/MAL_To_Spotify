@@ -57,8 +57,8 @@ $().ready(function () {
                 title: "Song",
                 data: "op_title",
                 render: (data, type, row, meta) => {
-                    out = `<div class='popup d-flex flex-row justify-content-between'>`
-                    button = `<button id='popup-btn-${row.anime_id}' class='btn btn-sm btn-outline-primary popup-btn'>Change</button>`
+                    out = `<div class='custom-modal d-flex flex-row justify-content-between'>`
+                    button = `<button id='custom-modal-btn-${row.anime_id}' class='btn btn-sm btn-outline-primary custom-modal-btn'>Change</button>`
                     if (row.op_uri == null)
                         out += data
                     else
@@ -157,69 +157,119 @@ $().ready(function () {
     });
 
 
-    $('body').on('click', '.popup-btn', function () {
-        let id = $(this).attr('id').split('-')[2];
+    $('body').on('click', '.custom-modal-btn', function () {
+        let id = $(this).attr('id').split('-')[3];
         let row = dataTable.fnGetData($(this).closest('tr'));
         if (row.op_uri == null) {
             row.op_uri = '';
             row.op_title = '';
             row.op_artist = '';
         }
-        let popup = `
-                    <div class='popup-content w-100'>
-                        <div class='popup-header d-flex w-100 justify-content-between'>
-                            <div class='popup-header-left'>
+        let modal = `
+                    <div class='custom-modal-content w-100'>
+                        <div class='custom-modal-header d-flex w-100 justify-content-between'>
+                            <div class='custom-modal-header-left'>
                                 <h3>${row.title}</h3>
                                 <h5>${row.op_title}</h5>
                             </div>  
-                            <div class='popup-header-right align-self-right'>
-                                <input type='button' class='btn btn-sm btn-danger' id='popup-close-btn' value='Close'>
+                            <div class='custom-modal-header-right align-self-right'>
+                                <input type='button' class='btn btn-sm btn-danger' id='custom-modal-close-btn' value='Close'>
                             </div>
                         </div>
-                    <div class='popup-body'>
-                        <div class='popup-body-top d-flex'>
-                            <div class='popup-body-left'>`;
+                    <div class='custom-modal-body'>
+                        <div class='custom-modal-body-top d-flex'>
+                            <div class='custom-modal-body-left'>`;
                                 if (row.op_uri == '') { //TODO: add custom anime-themed image
-                                    popup += `<img src='/static/error_img.jpg' alt='Not found image' width="300px">`;
+                                    modal += `<img src='/static/error_img.jpg' alt='Not found image' width="300px">`;
                                 } else {
-                                    popup+=`<iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300'
+                                    modal +=`<iframe src='https://open.spotify.com/embed/track/${row.op_uri.split(':').slice(-1)}' width='300'
                                     height='380' frameborder='0' allowtransparency='true' allow='encrypted-media'></iframe>`;
                                 }
-                                popup+=`</div>
-                            <div class='popup-body-right'>
-                                <ul>
-                                    <li>asdfasdf</li>
-                                    <li>asdfasdf</li>
-                                    <li>asdfasdf</li>
-                                </ul>
+                                modal +=`</div>
+                            <div class='custom-modal-body-right m-3 flex-grow-1'>
+                                <h5>Suggestions</h5> 
+                                <table class='w-100'>
+                                    <colgroup>
+                                        <col span='1' >
+                                        <col span='1' style='width: 100%;'>
+                                        <col span='1' >
+                                        <col span='1' >
+                                        <col span='1' >
+                                    </colgroup>
+                                `
+                                //instead of li tags use table with buttons (select, upvote, downvote) for each suggestion
+                                $.ajax({
+                                    url: '/api/suggestions/getSuggestions/' + id,
+                                    type: 'GET',
+                                    success: function (data) {
+                                        suggestions = JSON.parse(data);
+                                        console.log(suggestions);
+                                        suggestions.forEach(suggestion => {
+                                            // console.log(suggestion);
+                                            upvotes = suggestion.upvotes??0;
+                                            modal +=`
+                                            <tr>
+                                            <td>${upvotes}</td>
+                                            <td><a href="${suggestion.spotify_link}">${suggestion.song_title} by ${suggestion.artist}</a></td>
+                                            <td><button id='suggestion-select-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0z"/>
+                                                <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+                                            </svg>
+                                            </button></td>
+                                            <td><button id='suggestion-upvote-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
+                                                    <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                                </svg>
+                                            </button></td>
+                                            <td><button id='suggestion-downvote-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
+                                                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                                </svg>
+                                            </button></td>
+                                            </tr>`
+                                        });
+ 
+                                    },
+                                    error: function (data) {
+                                        console.log(data);
+                                    },
+                                    async: false
+                                });
+                                modal +=
+                                `</table>
                             </div>
                         </div>
 
-                        <div class='popup-body-bottom'>
+                        <div class='custom-modal-body-bottom'>
                         </div>
 
-                        <div class='popup-footer'>
+                        <div class='custom-modal-footer'>
                             <div class='song-submit input-group mb-3'>
                                 <span class='input-group-text'>Submit your own link</span>
                                 <div class='form-floating'>
-                                    <input type='text' class='form-control' id='popup-link-input' placeholder='Spotify link'>
-                                    <label for='popup-link-input'>Spotify link</label>
+                                    <input type='text' class='form-control' id='custom-modal-link-input' placeholder='Spotify link'>
+                                    <label for='custom-modal-link-input'>Spotify link</label>
                                 </div>
-                                <button id='popup-submit-btn' class='btn btn-primary input-group-text'>Submit</button>
+                                <button id='custom-modal-submit-btn' class='btn btn-primary input-group-text'>Submit</button>
                             </div>
                         </div>
                     </div>
                     `;
-        $('#popup').html(popup);
-        $('#popup').show();
+        $('#custom-modal').html(modal);
+        $('#custom-modal').show();
 
-        $('#popup-submit-btn').on('click', () => {
-            let link = $('#popup-link-input').val();
+        $('#custom-modal-submit-btn').on('click', () => {
+            let link = $('#custom-modal-link-input').val();
             $.ajax({
-                url: '/api/mal/updateOp/' + id + '/' + link,
+                url: '/api/suggestions/addSuggestion',
+                params: {
+                    opening_id: id,
+                    spotify_uri: link
+                },
                 type: 'GET',
                 success: function (data) {
-                    $('#popup').hide();
+                    $('#custom-modal').hide();
                     dataTable.fnReloadAjax();
                 },
                 error: function (data) {
@@ -229,8 +279,8 @@ $().ready(function () {
             });
         });
 
-        $('#popup-search-input').on('keyup', () => {
-            let query = $('#popup-search-input').val();
+        $('#custom-modal-search-input').on('keyup', () => {
+            let query = $('#custom-modal-search-input').val();
             if (query != '') {
                 $.ajax({
                     url: '/api/spotify/search/' + query,
@@ -239,19 +289,19 @@ $().ready(function () {
                         let results = data.tracks.items;
                         let out = '';
                         for (let i = 0; i < results.length; i++) {
-                            out += `<div class='popup-search-result' data-uri='${results[i].uri}'>`;
-                            out += `<div class='popup-search-result-left'>`;
+                            out += `<div class='custom-modal-search-result' data-uri='${results[i].uri}'>`;
+                            out += `<div class='custom-modal-search-result-left'>`;
                             out += `<img src='${results[i].album.images[2].url}' alt='album cover'>`;
                             out += `</div>`;
-                            out += `<div class='popup-search-result-right'>`;
+                            out += `<div class='custom-modal-search-result-right'>`;
                             out += `<h5>${results[i].name}</h5>`;
                             out += `<p>${results[i].artists[0].name}</p>`;
                             out += `</div>`;
                             out += `</div>`;
                         }
-                        $('#popup-search-results').html(out);
-                        $('.popup-search-result').on('click', function () {
-                            $('#popup-link-input').val($(this).attr('data-uri'));
+                        $('#custom-modal-search-results').html(out);
+                        $('.custom-modal-search-result').on('click', function () {
+                            $('#custom-modal-link-input').val($(this).attr('data-uri'));
                         });
                     },
                     error: function (data) {
@@ -263,8 +313,8 @@ $().ready(function () {
         });
 
 
-        $('#popup-close-btn').on('click', () => {
-            $('#popup').hide();
+        $('#custom-modal-close-btn').on('click', () => {
+            $('#custom-modal').hide();
         });
 
 
