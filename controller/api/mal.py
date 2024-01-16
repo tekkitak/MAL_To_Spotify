@@ -79,6 +79,7 @@ def malGenerateOPList():
                 "title": anime_title,
                 "anime_id": anime.id,
                 "mal_anime_id": anime_id,
+                "op_id": op.id,
                 "op_title": op.opening_title,
                 "op_artist": op.opening_artist,
                 "op_uri": op.GetBestSong().spotify_link if op.GetBestSong() is not None else None,

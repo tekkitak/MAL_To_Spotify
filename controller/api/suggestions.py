@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from model.database import db, Song, Anime, Vote, Opening, Artist
+from model.database import db, Song, Opening, Artist
 import json
 from controller.api.spotify import get_song_info
 from urllib.parse import unquote
@@ -26,16 +26,21 @@ def GetSuggestions(opening_id: int):
         })
     return json.dumps(out), 200
 
-@suggestions.route('/addSuggestion')
+@suggestions.route('/addSuggestion', methods = ['POST'])
 def AddSuggestion():
-    if request.args.get('spotify_uri', None) == None or request.args.get('opening_id', None) == None:
-        print(request.args)
+    data = request.get_json()
+    print(data)
+    if 'spotify_uri' not in data or 'opening_id' not in data:
         return 'No spotify uri or opening id provided', 400
-    spotify_uri:str = request.args.get('spotify_uri', None)
-    opening_id:int = int(request.args.get('opening_id', None))
+    spotify_uri:str = data['spotify_uri']
+    opening_id:int = int(data['opening_id'])
     opening = Opening.query.filter_by(id=opening_id).first()
 
 
+    #if spotify uri is link, extract uri
+    if spotify_uri.startswith('https:'):
+        spotify_uri = "spotify:track:" + extractSpotifyUri(unquote(spotify_uri))
+    
     #check if opening exists
     if opening == None:
         return 'Opening not found', 404
@@ -55,10 +60,6 @@ def AddSuggestion():
         artist = Artist(artist_name=res['album']['artists'][0]['name'])
         db.session.add(artist)
     
-    #if spotify uri is link, extract uri
-    if spotify_uri.startswith('https:'):
-        spotify_uri = extractSpotifyUri(unquote(spotify_uri))
-
     #create song
     print(f"Creating song {res['name']} by {res['album']['artists'][0]['name']}")
     song = Song(

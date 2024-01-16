@@ -58,7 +58,7 @@ $().ready(function () {
                 data: "op_title",
                 render: (data, type, row, meta) => {
                     out = `<div class='custom-modal d-flex flex-row justify-content-between'>`
-                    button = `<button id='custom-modal-btn-${row.anime_id}' class='btn btn-sm btn-outline-primary custom-modal-btn'>Change</button>`
+                    button = `<button id='custom-modal-btn-${row.op_id}' class='btn btn-sm btn-outline-primary custom-modal-btn'>Change</button>`
                     if (row.op_uri == null)
                         out += data
                     else
@@ -197,36 +197,35 @@ $().ready(function () {
                                         <col span='1' >
                                     </colgroup>
                                 `
-                                //instead of li tags use table with buttons (select, upvote, downvote) for each suggestion
                                 $.ajax({
                                     url: '/api/suggestions/getSuggestions/' + id,
                                     type: 'GET',
                                     success: function (data) {
                                         suggestions = JSON.parse(data);
-                                        console.log(suggestions);
-                                        suggestions.forEach(suggestion => {
-                                            // console.log(suggestion);
+                                        suggestions.forEach( function( suggestion, index ) {
                                             upvotes = suggestion.upvotes??0;
                                             modal +=`
                                             <tr>
                                             <td>${upvotes}</td>
                                             <td><a href="${suggestion.spotify_link}">${suggestion.song_title} by ${suggestion.artist}</a></td>
-                                            <td><button id='suggestion-select-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <td><button id='suggestion-select-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn suggestion-select-btn' data-uri='${suggestion.spotify_link}' data-op='${id}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
                                                     <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0z"/>
                                                     <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
                                                 </svg>
                                             </button></td>
-                                            <td><button id='suggestion-upvote-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <td><button id='suggestion-upvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
                                                     <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
                                                 </svg>
                                             </button></td>
-                                            <td><button id='suggestion-downvote-btn' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <td><button id='suggestion-downvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
                                                     <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                                 </svg>
                                             </button></td>
+                                            <td class='d-none'>${suggestion.song_title}</td>
+                                            <td class='d-none'>${suggestion.artist}</td>
                                             </tr>`
                                         });
  
@@ -263,14 +262,14 @@ $().ready(function () {
             let link = $('#custom-modal-link-input').val();
             $.ajax({
                 url: '/api/suggestions/addSuggestion',
-                params: {
+                data: JSON.stringify({
                     opening_id: id,
                     spotify_uri: link
-                },
-                type: 'GET',
+                }),
+                contentType: 'application/json',
+                type: 'POST',
                 success: function (data) {
                     $('#custom-modal').hide();
-                    dataTable.fnReloadAjax();
                 },
                 error: function (data) {
                     console.log(data);
@@ -320,5 +319,34 @@ $().ready(function () {
 
     });
 
+    //FIXME: fix the bug where while updating the row the data from the previous row is suddenly disappearing
+    $('body').on('click', '.suggestion-select-btn', function () {
+        spotify_uri = $(this).attr('data-uri');
+        song_index = $(this).attr('id').split('-')[3];
+        opening_id = $(this).attr('data-op');
+
+        let row = dataTable.fnGetData($('#custom-modal-btn-' + opening_id).closest('tr'));
+        console.log(row);
+        row.op_uri = spotify_uri;
+
+        new_op_title = row.op_title;
+        if (row.op_title.includes('(')) {
+            new_op_title = row.op_title.split('(')[0] + '(' + $('#suggestion-select-btn-' + song_index).closest('tr').find('td:nth-child(6)').text() + ')';
+        } else {
+            new_op_title = row.op_title + ' (' + $('#suggestion-select-btn-' + song_index).closest('tr').find('td:nth-child(6)').text() + ')';
+        }
+        row.op_title = new_op_title;
+
+        new_op_artist = row.op_artist;
+        if (row.op_artist.includes('(')) {
+            new_op_artist = row.op_artist.split('(')[0] + '(' + $('#suggestion-select-btn-' + song_index).closest('tr').find('td:nth-child(7)').text() + ')';
+        } else {
+            new_op_artist = row.op_artist + ' (' + $('#suggestion-select-btn-' + song_index).closest('tr').find('td:nth-child(7)').text() + ')';
+        }
+        row.op_artist = new_op_artist;
+
+        dataTable.fnUpdate(row, $('#custom-modal-btn-' + opening_id).closest('tr'));
+        $('#custom-modal').hide();
+    });
 
 });
