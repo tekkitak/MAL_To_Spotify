@@ -1,6 +1,8 @@
+# type: ignore
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+DB_VER = 1.0
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -17,7 +19,9 @@ class Anime(db.Model):
     __tablename__ = 'anime'
 
     id = db.Column(db.Integer, primary_key=True)
-    anime_title = db.Column(db.String(128), nullable=False)
+    mal_id = db.Column(db.Integer, nullable=True)
+    title = db.Column(db.String(128), nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=True)
 
     openings = db.relationship('Opening', secondary='anime_opening', back_populates='animes')
 
@@ -29,12 +33,19 @@ class Opening(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     opening_title = db.Column(db.String(128), nullable=False)
+    opening_artist = db.Column(db.String(128), nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=True)
 
     songs = db.relationship('Song', back_populates='opening', cascade='all, delete-orphan')
     animes = db.relationship('Anime', secondary='anime_opening', back_populates='openings')
 
     def __repr__(self) -> str:
-        return f'<Opening {self.id}, {self.opening_title}, {self.episodes}>'
+        return f'<Opening {self.id}, {self.opening_title}>'
+
+    def GetBestSong(self) -> 'Song | None':
+        if len(self.songs) == 0:
+            return None
+        return max(self.songs, key=lambda song: sum(vote.vote for vote in song.votes))
 
 class Song(db.Model):
     __tablename__ = 'song'
@@ -43,7 +54,7 @@ class Song(db.Model):
     song_title = db.Column(db.String(128), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
     artist = db.relationship('Artist', back_populates='songs')
-    opening_id = db.Column(db.Integer, db.ForeignKey('opening.id'), nullable=False)
+    opening_id = db.Column(db.Integer, db.ForeignKey('opening.id'), nullable=True)
     opening = db.relationship('Opening', back_populates='songs')
     spotify_link = db.Column(db.String(128), nullable=False)
 
@@ -113,7 +124,7 @@ anime_opening = db.Table(
     'anime_openings',
     db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
     db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
-    db.Column('episodes', db.String(128), nullable=False)
+    db.Column('episodes', db.String(128), nullable=True)
 )
 
 import_song = db.Table(

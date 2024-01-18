@@ -7,5 +7,6 @@ archive/**
 **/*.session.sql
 instance/**
 virtual.env
-pymyenv
-
+.gitignore
+pymyenv/
+.version

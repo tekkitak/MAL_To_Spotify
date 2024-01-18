@@ -1,10 +1,7 @@
 from datetime import datetime
-from model.database import db, Opening, Artist
-import re
 import requests as rq
 from flask import session, redirect, url_for
 from os import getenv
-from urllib.parse import urlencode
 from datetime import datetime, timedelta
 from base64 import b64encode as b64en
 from typing import Union, cast
@@ -19,37 +16,23 @@ def exec_request(url, headers=None, params=None, data=None, method='GET', auth=T
             # print('redirected for token expiration')
             refresh_auth()
 
-    res = rq.request(method, url, headers=headers, params=params, data=data)
-    
-    # print(f"exec: {res.status_code}")
+    i: int = 0
+    while True:
+        try:
+            res = rq.request(method, url, headers=headers, params=params, data=data, timeout=2)
+        except Exception as _:
+            print("Failed to connect to spotify, retrying...")
+            if i > 10:
+                raise Exception("Failed to connect to spotify after 10 retries")
+            i += 1
+            continue
+        break 
+
     if res.status_code == 401:
         print('401 error')
         print(res.text)
         raise Exception(res.json()["error"])
     return res
-
-def parseOP(op_str: str) -> Opening:
-    try:
-        # mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?', op_str)
-        mtch = re.search(r'"([^()\n\r\"]+)(?: \(.+\))?\\?".*by ([\w\sö＆$%ěščřžýáíé\s]+)(?: \(.+\))?(?:.*\(eps\s(\d+-\d+)\))?', op_str)
-        if mtch == None:
-            raise Exception("regex", f"regex failed to match string {op_str}")
-        title, artist_str, episodes= mtch.groups()
-        
-    except Exception as e:
-        print(e)
-        print(f"Error {op_str=}")
-        exit()
-
-    # FIXME: check if the opeing is already in the database
-    # artist = Artist.query.filter_by(artist_name=artist_str).first()
-    # if artist == None:
-    #     artist = Artist(artist_name=artist_str)
-    #     db.session.add(artist)
-    #     db.session.commit()
-    if episodes == None:
-        episodes = "All" # FIXME: add to the associative table
-    return Opening(opening_title=title)
 
 def refresh_auth() -> None:
     url = "https://accounts.spotify.com/api/token"
