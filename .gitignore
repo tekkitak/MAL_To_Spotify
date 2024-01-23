@@ -10,3 +10,4 @@ virtual.env
 .gitignore
 pymyenv/
 .version
+setup.cfg

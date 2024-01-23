@@ -1,27 +1,37 @@
 from flask import Flask, render_template, url_for, session
+from flask_session import Session  # type: ignore -- package stub issue...
+from flask_security import Security, auth_required, SQLAlchemyUserDatastore
 from datetime import datetime
-from flask_session import Session # type: ignore -- package stub issue... 
 from os import getenv
-from datetime import datetime
 
 from model.actions import register_commands
 from model.helper_functions import refresh_auth
-from model.database import db, DB_VER
+from model.database import db, DB_VER, User, Role
 from model.version_control import VersionControl
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists
 
+# Flask setup
 app = Flask(__name__)
 register_commands(app)
+# config
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
+app.config['SECURITY_PASSWORD_SALT'] = getenv('SECURITY_PASSWORD_SALT')
+# routing
 app.register_blueprint(error)
 app.register_blueprint(api)
+# SQLAlchemy
 db.init_app(app)
+# Security
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+app.security = Security(app, user_datastore)
+# Session
 Session(app)
+
 
 @app.before_first_request
 def check_version() -> None:
@@ -39,6 +49,7 @@ def check_version() -> None:
             exit()
     verControl.save()
 
+
 @app.route('/')
 def index():
     playlists = []
@@ -50,4 +61,9 @@ def index():
                            Spotify_OAuth_url=url_for('api.spotify.spotifyAuth'),
                            MAL_OAuth_url=url_for('api.mal.malAuth'),
                            playlists=playlists
-                          )
+                           )
+
+@app.route('/test')
+@auth_required()
+def test():
+    return render_template_string('Hello {{ current_user.username }}')

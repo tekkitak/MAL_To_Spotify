@@ -1,8 +1,12 @@
 # type: ignore
+
 from flask_sqlalchemy import SQLAlchemy
+from flask_security.models import fsqla_v3 as fsqla
 
 db = SQLAlchemy()
 DB_VER = 1.0
+fsqla.FsModels.set_db_info(db)
+
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -14,6 +18,7 @@ class Artist(db.Model):
 
     def __repr__(self) -> str:
         return f'<Artist {self.id}, {self.artist_name}>'
+
 
 class Anime(db.Model):
     __tablename__ = 'anime'
@@ -27,6 +32,7 @@ class Anime(db.Model):
 
     def __repr__(self) -> str:
         return f'<Anime {self.id}, {self.anime_title}>'
+
 
 class Opening(db.Model):
     __tablename__ = 'opening'
@@ -47,6 +53,7 @@ class Opening(db.Model):
             return None
         return max(self.songs, key=lambda song: sum(vote.vote for vote in song.votes))
 
+
 class Song(db.Model):
     __tablename__ = 'song'
 
@@ -64,7 +71,8 @@ class Song(db.Model):
     def __repr__(self) -> str:
         return f'<Song {self.id}, {self.song_title}, {self.artist}, {self.opening}, {self.spotify_link}>'
 
-class User(db.Model):
+
+class User(db.Model, fsqla.FsUserMixin):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -80,6 +88,12 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
 
+
+class Role(db.Model, fsqla.FsRoleMixin):
+    __tablename__ = 'role'
+    pass
+
+
 class Vote(db.Model):
     __tablename__ = 'vote'
 
@@ -90,14 +104,16 @@ class Vote(db.Model):
     song = db.relationship('Song', back_populates='votes')
     vote = db.Column(db.Integer, nullable=False)
 
+
 class Import(db.Model):
     __tablename__ = 'import'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='imports')
-    time= db.Column(db.DateTime, nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
     songs = db.relationship('Song', secondary='import_song', back_populates='imports')
+
 
 class OAuth2(db.Model):
     __tablename__ = 'oauth2'
@@ -111,6 +127,7 @@ class OAuth2(db.Model):
     refresh_token = db.Column(db.String(128), nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
 
+
 class Sync(db.Model):
     __tablename__ = 'sync'
 
@@ -119,6 +136,7 @@ class Sync(db.Model):
     user = db.relationship('User', back_populates='syncs')
     provider = db.Column(db.String(128), nullable=False)
     last_synced_at = db.Column(db.DateTime, nullable=False)
+
 
 anime_opening = db.Table(
     'anime_opening',
