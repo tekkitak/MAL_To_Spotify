@@ -1,10 +1,14 @@
+'''database.py - Database ORM'''
+
 # type: ignore
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 DB_VER = 1.0
 
+
 class Artist(db.Model):
+    '''ORM for artist table'''
     __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +19,9 @@ class Artist(db.Model):
     def __repr__(self) -> str:
         return f'<Artist {self.id}, {self.artist_name}>'
 
+
 class Anime(db.Model):
+    '''ORM for anime table'''
     __tablename__ = 'anime'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -28,7 +34,9 @@ class Anime(db.Model):
     def __repr__(self) -> str:
         return f'<Anime {self.id}, {self.anime_title}>'
 
+
 class Opening(db.Model):
+    '''ORM for opening table'''
     __tablename__ = 'opening'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,11 +51,14 @@ class Opening(db.Model):
         return f'<Opening {self.id}, {self.opening_title}>'
 
     def GetBestSong(self) -> 'Song | None':
+        '''Returns song with most votes'''
         if len(self.songs) == 0:
             return None
         return max(self.songs, key=lambda song: sum(vote.vote for vote in song.votes))
 
+
 class Song(db.Model):
+    '''ORM for song table'''
     __tablename__ = 'song'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +75,9 @@ class Song(db.Model):
     def __repr__(self) -> str:
         return f'<Song {self.id}, {self.song_title}, {self.artist}, {self.opening}, {self.spotify_link}>'
 
+
 class User(db.Model):
+    '''ORM for user table'''
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -80,7 +93,9 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
 
+
 class Vote(db.Model):
+    '''ORM for vote table'''
     __tablename__ = 'vote'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -90,16 +105,20 @@ class Vote(db.Model):
     song = db.relationship('Song', back_populates='votes')
     vote = db.Column(db.Integer, nullable=False)
 
+
 class Import(db.Model):
+    '''ORM for import table'''
     __tablename__ = 'import'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='imports')
-    time= db.Column(db.DateTime, nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
     songs = db.relationship('Song', secondary='import_song', back_populates='imports')
 
+
 class OAuth2(db.Model):
+    '''ORM for oauth2 table'''
     __tablename__ = 'oauth2'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -111,7 +130,9 @@ class OAuth2(db.Model):
     refresh_token = db.Column(db.String(128), nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
 
+
 class Sync(db.Model):
+    '''ORM for sync table'''
     __tablename__ = 'sync'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -119,6 +140,7 @@ class Sync(db.Model):
     user = db.relationship('User', back_populates='syncs')
     provider = db.Column(db.String(128), nullable=False)
     last_synced_at = db.Column(db.DateTime, nullable=False)
+
 
 anime_opening = db.Table(
     'anime_opening',

@@ -1,19 +1,20 @@
+'''suggestions.py - Suggestions API controller'''
+import json
+from urllib.parse import unquote
 from flask import Blueprint, request
 from model.database import db, Song, Opening, Artist
-import json
 from controller.api.spotify import get_song_info
-from urllib.parse import unquote
 
-
-suggestions = Blueprint('suggestions', __name__, 
-                        template_folder='templates/api/suggestions', 
+suggestions = Blueprint('suggestions', __name__,
+                        template_folder='templates/api/suggestions',
                         url_prefix='/suggestions')
 
 
 @suggestions.route('/getSuggestions/<int:opening_id>')
-def GetSuggestions(opening_id: int):
+def get_suggestions(opening_id: int):
+    '''Gets suggestions for an opening'''
     opening = Opening.query.filter_by(id=opening_id).first()
-    if opening == None:
+    if opening is None:
         return 'Opening not found', 404
     print(opening)
     out: list[dict[str, str | int]] = []  # Explicitly define the types of dictionary keys and values
@@ -26,8 +27,10 @@ def GetSuggestions(opening_id: int):
         })
     return json.dumps(out), 200
 
-@suggestions.route('/addSuggestion', methods = ['POST'])
-def AddSuggestion():
+
+@suggestions.route('/addSuggestion', methods=['POST'])
+def add_suggestion():
+    '''Adds a suggestion to an opening'''
     data = request.get_json()
     print(data)
     if 'spotify_uri' not in data or 'opening_id' not in data:
@@ -36,36 +39,35 @@ def AddSuggestion():
     opening_id:int = int(data['opening_id'])
     opening = Opening.query.filter_by(id=opening_id).first()
 
-
-    #if spotify uri is link, extract uri
+    # if spotify uri is link, extract uri
     if spotify_uri.startswith('https:'):
-        spotify_uri = "spotify:track:" + extractSpotifyUri(unquote(spotify_uri))
-    
-    #check if opening exists
-    if opening == None:
+        spotify_uri = "spotify:track:" + extract_spotify_uri(unquote(spotify_uri))
+
+    # check if opening exists
+    if opening is None:
         return 'Opening not found', 404
     song = Song.query.filter_by(spotify_link=spotify_uri).first()
-    if song != None:
+    if song is not None:
         return 'Song already exists', 409
-    #search spotify for song info
+    # search spotify for song info
     res = get_song_info(spotify_uri)
 
     if res is None:
         return 'Song not found', 404
-    
-    #check if artist exists
+
+    # check if artist exists
     artist = Artist.query.filter_by(artist_name=res['album']['artists'][0]['name']).first()
-    if artist == None:
-        #create artist
+    if artist is None:
+        # create artist
         artist = Artist(artist_name=res['album']['artists'][0]['name'])
         db.session.add(artist)
-    
-    #create song
+
+    # create song
     print(f"Creating song {res['name']} by {res['album']['artists'][0]['name']}")
     song = Song(
-        song_title = res['name'],
-        spotify_link = spotify_uri,
-        artist = artist,
+        song_title=res['name'],
+        spotify_link=spotify_uri,
+        artist=artist,
     )
 
     db.session.add(song)
@@ -74,5 +76,6 @@ def AddSuggestion():
     return 'Song added', 200
 
 
-def extractSpotifyUri(spotify_link: str) -> str:
+def extract_spotify_uri(spotify_link: str) -> str:
+    '''Extracts the spotify uri from a spotify link'''
     return spotify_link.split('/')[-1].split('?')[0]
