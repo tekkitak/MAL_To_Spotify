@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, session
+from flask import Flask, render_template, url_for, session, render_template_string
 from flask_session import Session  # type: ignore -- package stub issue...
 from flask_security import Security, auth_required, SQLAlchemyUserDatastore
 from datetime import datetime
@@ -62,6 +62,7 @@ def index():
                            MAL_OAuth_url=url_for('api.mal.malAuth'),
                            playlists=playlists
                            )
+
 
 @app.route('/test')
 @auth_required()
