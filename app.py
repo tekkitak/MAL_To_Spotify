@@ -21,6 +21,8 @@ app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 app.config['SECURITY_PASSWORD_SALT'] = getenv('SECURITY_PASSWORD_SALT')
+app.config['SECURITY_BLUEPRINT_NAME'] = 'security'
+app.config['SECURITY_STATIC_FOLDER'] = 'security'
 # routing
 app.register_blueprint(error)
 app.register_blueprint(api)
