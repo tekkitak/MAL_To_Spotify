@@ -11,11 +11,11 @@
     {{ register_user_form.hidden_tag() }}
     <div class="form-group">
         <label for="email">{{ _fsdomain('Email') }}</label>
-        <input type="email" class="form-control" id="email" name="email" placeholder="{{ _fsdomain('Email') }}" value="{{ register_user_form.email.data|e }}" required>
+        <input type="email" class="form-control" id="email" name="email" placeholder="{{ _fsdomain('Email') }}" required>
     </div>
     <div class="form-group">
         <label for="username">{{ _fsdomain('Username') }}</label>
-        <input type="text" class="form-control" id="username" name="username" placeholder="{{ _fsdomain('Username') }}" value="{{ register_user_form.username.data|e }}" required>
+        <input type="text" class="form-control" id="username" name="username" placeholder="{{ _fsdomain('Username') }}" required>
     </div>
     <div class="form-group">
         <label for="password">{{ _fsdomain('Password') }}</label>
@@ -25,7 +25,7 @@
         <label for="password_confirm">{{ _fsdomain('Password Confirm') }}</label>
         <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="{{ _fsdomain('Password Confirm') }}" required>
     </div>
-    {{ render_field_with_errors(register_user_form.recaptcha) }}
+    {# {{ render_field_with_errors(register_user_form.recaptcha) }} #}
     <button type="submit" class="btn btn-primary">{{ _fsdomain('Register') }}</button>
 </form>
 {% endblock %}

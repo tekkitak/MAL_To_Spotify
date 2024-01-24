@@ -23,6 +23,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
 app.config['SECURITY_PASSWORD_SALT'] = getenv('SECURITY_PASSWORD_SALT')
 app.config['SECURITY_BLUEPRINT_NAME'] = 'security'
 app.config['SECURITY_STATIC_FOLDER'] = 'security'
+app.config['SECURITY_REGISTERABLE'] = True
+app.config["SECURITY_CONFIRMABLE"] = False
 # routing
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
