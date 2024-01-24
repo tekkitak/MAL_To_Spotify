@@ -2,11 +2,15 @@ from flask import Flask
 from typing import cast
 import click
 from flask.cli import with_appcontext
+<<<<<<< Updated upstream
 from model.database import db, DB_VER
 from model.version_control import verControl
+=======
+>>>>>>> Stashed changes
 from os import getenv, system, path, makedirs
 from shutil import copyfile
 from sqlalchemy import create_engine
+from model.database import db
 from sqlalchemy_utils import database_exists
 
 SQLEngine = create_engine(getenv('DATABASE_URL'))
