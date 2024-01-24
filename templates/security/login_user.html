@@ -2,15 +2,41 @@
 {% from "security/_macros.html" import render_field_with_errors, render_field, render_field_errors %}
 
 {% block content %}
-{% include "security/_messages.html" %}
 <h1>{{ _fsdomain('Login') }}</h1>
-<form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+
+<form action="{{ url_for_security('login') }}" method="POST" name="login_user_form" class="form">
   {{ login_user_form.hidden_tag() }}
-  {{ render_field_with_errors(login_user_form.email) }}
-  {{ render_field_with_errors(login_user_form.password) }}
-  {{ render_field_with_errors(login_user_form.remember) }}
+  <div class="form-group">
+    <label for="email">{{ _fsdomain('Email') }}</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="{{ _fsdomain('Email') }}">
+  </div>
+  <div class="form-group">
+    <label for="password">{{ _fsdomain('Password') }}</label>
+    <input type="password" class="form-control" id="password" name="password" placeholder="{{ _fsdomain('Password') }}">
+  </div>
+  <div class="form-group">
+    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+    <label class="form-check-label" for="remember">{{ _fsdomain('Remember me') }}</label>
+  </div>
   {{ render_field_errors(login_user_form.csrf_token) }}
-  {{ render_field(login_user_form.submit) }}
+  <button type="submit" class="btn btn-primary">{{ _fsdomain('Login') }}</button>
 </form>
-{% include "security/_menu.html" %}
+{% endblock %}
+
+{% block toasts %}
+  {% if login_user_form.errors %}
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">{{ _fsdomain('Error') }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {% for field in login_user_form.errors: %}
+          {% for error in login_user_form.errors[field] %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

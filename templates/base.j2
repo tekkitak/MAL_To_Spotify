@@ -31,5 +31,30 @@
     <div class="body-container container bg-light min-vh-100 p-4">
         {% block content %} {% endblock %}
     </div>
+    <div class="toast-container position-absolute top-0 end-0 p-5">
+        <!-- TODO: Add toasts from backend -->
+
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">{{category}}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    {{message}}
+                </div>
+            </div>
+        {% endfor %}
+
+
+        {% block toasts %} {% endblock %}
+    </div>
+    <script>
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    var toastList = toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl)
+    })
+    toastList.forEach(toast => toast.show())
+    </script>
 </body>
 </html>
