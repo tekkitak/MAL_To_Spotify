@@ -1,0 +1,49 @@
+{% extends "base.j2" %}
+
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h1>{{ _fsdomain('Register')}}</h1>
+
+<form action="{{ url_for_security('register') }}" method="POST" name="register_user_form" class="form">
+    {{ register_user_form.hidden_tag() }}
+    <div class="form-group">
+        <label for="email">{{ _fsdomain('Email') }}</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="{{ _fsdomain('Email') }}" value="{{ register_user_form.email.data|e }}" required>
+    </div>
+    <div class="form-group">
+        <label for="username">{{ _fsdomain('Username') }}</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="{{ _fsdomain('Username') }}" value="{{ register_user_form.username.data|e }}" required>
+    </div>
+    <div class="form-group">
+        <label for="password">{{ _fsdomain('Password') }}</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="{{ _fsdomain('Password') }}" required>
+    </div>
+    <div class="form-group">
+        <label for="password_confirm">{{ _fsdomain('Password Confirm') }}</label>
+        <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="{{ _fsdomain('Password Confirm') }}" required>
+    </div>
+    {{ render_field_with_errors(register_user_form.recaptcha) }}
+    <button type="submit" class="btn btn-primary">{{ _fsdomain('Register') }}</button>
+</form>
+{% endblock %}
+
+{% block toasts %}
+  {% if register_user_form.errors %}
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">{{ _fsdomain('Error') }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        {% for field in register_user_form.errors: %}
+          {% for error in register_user_form.errors[field] %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
