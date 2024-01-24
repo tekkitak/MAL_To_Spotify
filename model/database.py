@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_security.models import fsqla_v2 as fsqla
 
 db = SQLAlchemy()
-DB_VER = 1.1
+DB_VER = 1.2
 fsqla.FsModels.set_db_info(db)
 
 
