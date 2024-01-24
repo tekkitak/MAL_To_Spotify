@@ -2,12 +2,21 @@ from flask import Flask, render_template, url_for, session, render_template_stri
 from flask_session import Session  # type: ignore -- package stub issue...
 from flask_security import Security, auth_required, SQLAlchemyUserDatastore, hash_password
 from datetime import datetime
+<<<<<<< Updated upstream
+=======
+from flask_security import Security, SQLAlchemyUserDatastore, auth_required, hash_password
+from flask_session import Session # type: ignore -- package stub issue... 
+>>>>>>> Stashed changes
 from os import getenv
 
 from model.actions import register_commands
 from model.helper_functions import refresh_auth
+<<<<<<< Updated upstream
 from model.database import db, DB_VER, User, Role
 from model.version_control import verControl
+=======
+from model.database import db, User, Role
+>>>>>>> Stashed changes
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists
@@ -19,17 +28,36 @@ register_commands(app)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
+app.config['SECURITY_PASSWORD_SALT'] = "penis" # NOTE: tempomary
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
+<<<<<<< Updated upstream
 app.config['SECURITY_PASSWORD_SALT'] = getenv('SECURITY_PASSWORD_SALT')
 # routing
+=======
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# have session and remember cookie be samesite (flask/flask_login)
+app.config["REMEMBER_COOKIE_SAMESITE"] = "strict"
+app.config["SESSION_COOKIE_SAMESITE"] = "strict"
+
+>>>>>>> Stashed changes
 app.register_blueprint(error)
 app.register_blueprint(api)
 # SQLAlchemy
 db.init_app(app)
+<<<<<<< Updated upstream
 # Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 app.security = Security(app, user_datastore)
 # Session
+=======
+
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
+>>>>>>> Stashed changes
 Session(app)
 
 

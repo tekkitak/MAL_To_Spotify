@@ -1,12 +1,28 @@
 # type: ignore
 
 from flask_sqlalchemy import SQLAlchemy
-from flask_security.models import fsqla_v3 as fsqla
+from flask_security.models import fsqla_v2 as fsqla
 
 db = SQLAlchemy()
 DB_VER = 1.1
 fsqla.FsModels.set_db_info(db)
 
+<<<<<<< Updated upstream
+=======
+anime_opening = db.Table(
+    'anime_opening',
+    db.Column('anime_id', db.Integer, db.ForeignKey('anime.id'), primary_key=True),
+    db.Column('opening_id', db.Integer, db.ForeignKey('opening.id'), primary_key=True),
+    db.Column('episodes', db.String(128), nullable=False)
+)
+
+import_song = db.Table(
+    'import_song',
+    db.Column('import_id', db.Integer, db.ForeignKey('import.id'), primary_key=True),
+    db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
+)
+
+>>>>>>> Stashed changes
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -71,10 +87,18 @@ class Song(db.Model):
     def __repr__(self) -> str:
         return f'<Song {self.id}, {self.song_title}, {self.artist}, {self.opening}, {self.spotify_link}>'
 
+<<<<<<< Updated upstream
+=======
+class Role(db.Model, fsqla.FsRoleMixin):
+    
+    pass
+>>>>>>> Stashed changes
 
 class User(db.Model, fsqla.FsUserMixin):
-    __tablename__ = 'user'
+    pass
+    # __tablename__ = 'user'
 
+<<<<<<< Updated upstream
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(128), nullable=False)
     password = db.Column(db.String(128), nullable=False)
@@ -84,9 +108,24 @@ class User(db.Model, fsqla.FsUserMixin):
     oauth2s = db.relationship('OAuth2', back_populates='user', cascade='all, delete-orphan')
     syncs = db.relationship('Sync', back_populates='user', cascade='all, delete-orphan')
     imports = db.relationship('Import', back_populates='user', cascade='all, delete-orphan')
+=======
+    # id = db.Column(db.Integer, primary_key=True)
 
-    def __repr__(self) -> str:
-        return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
+    # email = db.Column(db.String(255), unique=True)
+    # username = db.Column(db.String(128), nullable=False)
+    # password = db.Column(db.String(255))
+    # active = db.Column(db.Boolean())
+    # confirmed_at = db.Column(db.DateTime())
+
+    # myanimelist_id = db.Column(db.String(length=128), nullable=True)
+    # votes = db.relationship('Vote', back_populates='user', cascade='all, delete-orphan')
+    # oauth2s = db.relationship('OAuth2', back_populates='user', cascade='all, delete-orphan')
+    # syncs = db.relationship('Sync', back_populates='user', cascade='all, delete-orphan')
+    # imports = db.relationship('Import', back_populates='user', cascade='all, delete-orphan')
+>>>>>>> Stashed changes
+
+    # def __repr__(self) -> str:
+    #     return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
 
 
 class Role(db.Model, fsqla.FsRoleMixin):
