@@ -29,9 +29,6 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# have session and remember cookie be samesite (flask/flask_login)
-app.config["REMEMBER_COOKIE_SAMESITE"] = "strict"
-app.config["SESSION_COOKIE_SAMESITE"] = "strict"
 
 app.register_blueprint(error)
 app.register_blueprint(api)
