@@ -93,3 +93,6 @@ class VersionControl():
             bool: True if the key and value match, False if not
         """
         return self.ver_content.get(key, None) == value
+
+verControl = VersionControl()
+

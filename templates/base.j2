@@ -1,35 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <meta charset="UTF-8">
-    <title>{% block title %} {% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <head>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <meta charset="UTF-8">
+        <title>{% block title %} {% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 
-    {% block head %} {% endblock %}
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a href="{{ url_for('index') }}" class="navbar-brand">Home</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                    {% if session.logged_in %}
-                        <a href="{{ url_for('security.logout') }}" class="nav-link">Logout</a>
-                    {% else %}
-                        <a href="{{ url_for('security.login') }}" class="nav-link">Login</a>
-                    {% endif %}
+        {% block head %} {% endblock %}
+    </head>
+    <body>
+        <div class="body-container container bg-light min-vh-100 px-4">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom mb-3">
+                <div class="container-fluid">
+                    <a href="{{ url_for('index') }}" class="navbar-brand">
+                        <img src="{{ url_for('static', filename='favicon.ico') }}" alt="Logo" height="30" class="d-inline-block align-text-top">
+                        AToS
+                    </a>
+                    <div class="collapse d-flex" id="navbarBase">
+                        {% if current_user.is_authenticated %}
+                            <div class="navbar-nav">
+                                <div class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        User
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li class="dropdown-item">
+                                            <a class="nav-link" href="#">Profile</a> <!-- todo add url for profile page -->
+                                        </li>
+                                        <li class="dropdown-item">
+                                            <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('security.login') }}" class="nav-link">Login</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            </nav>
+            {% block content %} {% endblock %}
         </div>
-    </nav>
-    <div class="body-container container bg-light min-vh-100 p-4">
-        {% block content %} {% endblock %}
-    </div>
-</body>
+    </body>
 </html>
