@@ -15,15 +15,22 @@ from controller.api.spotify import spotify_playlists
 # Flask setup
 app = Flask(__name__)
 register_commands(app)
+
+
 # config
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
 app.config['SECRET_KEY'] = getenv('FLASK_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
+# Flask-Security config
 app.config['SECURITY_PASSWORD_SALT'] = getenv('SECURITY_PASSWORD_SALT')
 app.config['SECURITY_BLUEPRINT_NAME'] = 'security'
 app.config['SECURITY_STATIC_FOLDER'] = 'security'
 app.config['SECURITY_REGISTERABLE'] = True
+app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
+app.config['SECURITY_EMAIL_SENDER'] = None
+app.config['SECURITY_USERNAME_ENABLE'] = True
+app.config['SECURITY_USERNAME_REQUIRED'] = True
 app.config["SECURITY_CONFIRMABLE"] = False
 # routing
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
@@ -31,6 +38,9 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# have session and remember cookie be samesite (flask/flask_login)
+# app.config["REMEMBER_COOKIE_SAMESITE"] = "strict"
+# app.config["SESSION_COOKIE_SAMESITE"] = "strict"
 
 app.register_blueprint(error)
 app.register_blueprint(api)

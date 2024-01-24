@@ -75,7 +75,7 @@ class User(db.Model, fsqla.FsUserMixin):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(128), nullable=False)
+    # username = db.Column(db.String(128), nullable=False)
     password = db.Column(db.String(128), nullable=False)
     myanimelist_id = db.Column(db.String(length=128), nullable=True)
 
