@@ -9,4 +9,4 @@ Flask-SQLAlchemy==3.0.3
 SQLAlchemy-Utils>=0.38.3
 Werkzeug>=2.2.0, <3.0.0
 flask-security-too==5.1.2
-
+bcrypt=4.1.2

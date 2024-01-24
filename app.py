@@ -1,13 +1,13 @@
 from flask import Flask, render_template, url_for, session, render_template_string
 from flask_session import Session  # type: ignore -- package stub issue...
-from flask_security import Security, auth_required, SQLAlchemyUserDatastore
+from flask_security import Security, auth_required, SQLAlchemyUserDatastore, hash_password
 from datetime import datetime
 from os import getenv
 
 from model.actions import register_commands
 from model.helper_functions import refresh_auth
 from model.database import db, DB_VER, User, Role
-from model.version_control import VersionControl
+from model.version_control import verControl
 from controller.error import error
 from controller.api_root import api
 from controller.api.spotify import spotify_playlists
@@ -35,7 +35,6 @@ Session(app)
 
 @app.before_first_request
 def check_version() -> None:
-    verControl = VersionControl()
     # Checks for all the versioning done with versionControl
     if not verControl.compare('db_ver', str(DB_VER)):
         MSG = "Database version mismatch. Do you want to update the database? (y/n)\n"
@@ -47,7 +46,7 @@ def check_version() -> None:
         else:
             print("Quitting...")
             exit()
-    verControl.save()
+        verControl.save()
 
 
 @app.route('/')
@@ -63,6 +62,16 @@ def index():
                            playlists=playlists
                            )
 
+@app.route('/cradmin')
+def cradmin():
+    if not app.security.datastore.find_user(email="test@me.com"):
+        app.security.datastore.create_user(email="test@me.com",
+                                           password=hash_password("password"),
+                                           username="Admin",
+                                           active=True)
+        db.session.commit()
+        return 'Success'
+    return 'Already exists'
 
 @app.route('/test')
 @auth_required()
