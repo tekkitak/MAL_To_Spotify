@@ -22,28 +22,55 @@
                     </a>
                     <div class="collapse d-flex" id="navbarBase">
                         {% if current_user.is_authenticated %}
-                            <div class="navbar-nav">
-                                <div class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                        User
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-item">
-                                            <a class="nav-link" href="#">Profile</a> <!-- todo add url for profile page -->
-                                        </li>
-                                        <li class="dropdown-item">
-                                            <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
-                                        </li>
-                                    </ul>
-                                </div>
+                        <div class="navbar-nav">
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    User
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="#">Profile</a> <!-- todo add url for profile page -->
+                                    </li>
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
+                                    </li>
+                                </ul>
                             </div>
+                        </div>
                         {% else %}
-                            <a href="{{ url_for('security.login') }}" class="nav-link">Login</a>
+                        <a href="{{ url_for('security.login') }}" class="nav-link">Login</a>
                         {% endif %}
                     </div>
                 </div>
             </nav>
-            {% block content %} {% endblock %}
+            <div class="body-container container bg-light min-vh-100 p-4">
+                {% block content %} {% endblock %}
+            </div>
+            <div class="toast-container position-absolute top-0 end-0 p-5">
+                <!-- TODO: Add toasts from backend -->
+
+                {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">{{category}}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{message}}
+                    </div>
+                </div>
+                {% endfor %}
+
+
+                {% block toasts %} {% endblock %}
+            </div>
+            <script>
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                var toastList = toastElList.map(function (toastEl) {
+                    return new bootstrap.Toast(toastEl)
+                })
+                toastList.forEach(toast => toast.show())
+            </script>
         </div>
     </body>
 </html>
