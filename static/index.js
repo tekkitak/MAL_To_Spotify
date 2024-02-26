@@ -30,6 +30,14 @@ $().ready(function () {
         dom: 'lfrtpB',
         ajax: {
             url: "/api/mal/animeOpList",
+            data: {
+                watching: true,
+                completed: true,
+                on_hold: false,
+                dropped: false,
+                plan_to_watch: false
+            },
+            traditional: true,
             dataSrc: (json) => {
                 return json.filter(function (item) {
                     return true
@@ -171,7 +179,7 @@ $().ready(function () {
                             <div class='custom-modal-header-left'>
                                 <h3>${row.title}</h3>
                                 <h5>${row.op_title}</h5>
-                            </div>  
+                            </div>
                             <div class='custom-modal-header-right align-self-right'>
                                 <input type='button' class='btn btn-sm btn-danger' id='custom-modal-close-btn' value='Close'>
                             </div>
@@ -187,7 +195,7 @@ $().ready(function () {
                                 }
                                 modal +=`</div>
                             <div class='custom-modal-body-right m-3 flex-grow-1'>
-                                <h5>Suggestions</h5> 
+                                <h5>Suggestions</h5>
                                 <table class='w-100'>
                                     <colgroup>
                                         <col span='1' >
@@ -228,7 +236,7 @@ $().ready(function () {
                                             <td class='d-none'>${suggestion.artist}</td>
                                             </tr>`
                                         });
- 
+
                                     },
                                     error: function (data) {
                                         console.log(data);

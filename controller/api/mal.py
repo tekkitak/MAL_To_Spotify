@@ -9,18 +9,18 @@ from flask import Blueprint, redirect, url_for, request, session
 from flask import redirect, url_for, request, session
 from model.oauth2 import MalOAuth2Builder, OAuth2
 from model.database import db, Anime, Opening, Artist, Vote, Song
-from controller.api.spotify import create_spotify_song 
+from controller.api.spotify import create_spotify_song
 from sqlalchemy.orm import Session as SQLSession
 
-mal = Blueprint('mal', __name__, 
+mal = Blueprint('mal', __name__,
                 template_folder='templates/api/mal',
                 url_prefix='/mal')
 
 @mal.route('/auth')
-def malAuth(): 
+def malAuth():
     if session.get('mal_oauth', None) is None:
-        session['mal_oauth'] = MalOAuth2Builder(getenv('MAL_ID'), 
-                                                getenv('MAL_SECRET'), 
+        session['mal_oauth'] = MalOAuth2Builder(getenv('MAL_ID'),
+                                                getenv('MAL_SECRET'),
                                                 "http://localhost:5000/api/mal/auth")
         return redirect(session['mal_oauth'].get_auth_url())
 
@@ -40,7 +40,7 @@ def malGenerateOPList():
     # output json
     json_out: list[dict[str, str]] = []
 
-    # Get user anime list 
+    # Get user anime list
     anime_list = getAnimeList(Oauth)
 
     # Find openings from db, if fails find from api
@@ -49,11 +49,16 @@ def malGenerateOPList():
         anime_title: str = anime_data['title'] # type: ignore
         anime_id: int = int(anime_data['id']) # type: ignore
 
-        comp_only: bool = request.args.get("completed_only", "true") == "true"
-        if anime_status in ["dropped", "plan_to_watch"]:
+        # comp_only: bool = request.args.get("completed_only", "true") == "true"
+        # if anime_status in ["dropped", "plan_to_watch", "on_hold"]:
+        #     continue
+        # if comp_only and anime_status != "completed":
+        #     continue
+
+        if request.args.get(anime_status, "false") == "false":
+            print(f"Skipping {anime_title} with status '{anime_status}' as the request is '{request.args.get(anime_status)}'")
             continue
-        if comp_only and anime_status != "completed":
-            continue
+
 
         cached: Anime = Anime.query.filter_by(title=anime_title).one_or_none() # type: ignore
         anime: Anime
@@ -86,7 +91,7 @@ def malGenerateOPList():
             }] # type: ignore
 
     db.session.commit()
-    # { 
+    # {
     #     "title": cached.anime_title,
     #     "op_title": op.opening_title,
     #     "op_artist": op.artist.name,
@@ -129,7 +134,7 @@ def updateAnimeOpeningsList(auth: OAuth2, anime: Anime) -> list[Any]:
 
     auth
         OAuth2 object for MAL
-    
+
     anime
         Anime object to get openings for (needs id set)
     """
@@ -169,7 +174,7 @@ def parseOpStr(op_str: str) -> tuple[str, str, str]:
     """
     Parse the opening string into a tuple of (title, artist, episodes)
 
-    op_str 
+    op_str
         The string to parse
 
     --------------------------------------------
