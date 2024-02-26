@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, session, render_template_string
 from flask_session import Session  # type: ignore -- package stub issue...
-from flask_security import Security, auth_required, SQLAlchemyUserDatastore, hash_password
+from flask_security import Security, auth_required, SQLAlchemyUserDatastore, hash_password, user_registered
 from datetime import datetime
 from os import getenv
 
@@ -10,6 +10,7 @@ from model.database import db, DB_VER, User, Role
 from model.version_control import verControl
 from controller.error import error
 from controller.api_root import api
+from controller.user import user
 from controller.api.spotify import spotify_playlists
 
 # Flask setup
@@ -32,6 +33,7 @@ app.config['SECURITY_EMAIL_SENDER'] = None
 app.config['SECURITY_USERNAME_ENABLE'] = True
 app.config['SECURITY_USERNAME_REQUIRED'] = True
 app.config["SECURITY_CONFIRMABLE"] = False
+app.config["SECURITY_WAN_ALLOW_AS_FIRST_FACTOR"] = True
 # routing
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
@@ -44,6 +46,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 app.register_blueprint(error)
 app.register_blueprint(api)
+app.register_blueprint(user)
 # SQLAlchemy
 db.init_app(app)
 # Security
@@ -82,18 +85,3 @@ def index():
                            playlists=playlists
                            )
 
-@app.route('/cradmin')
-def cradmin():
-    if not app.security.datastore.find_user(email="test@me.com"):
-        app.security.datastore.create_user(email="test@me.com",
-                                           password=hash_password("password"),
-                                           username="Admin",
-                                           active=True)
-        db.session.commit()
-        return 'Success'
-    return 'Already exists'
-
-@app.route('/test')
-@auth_required()
-def test():
-    return render_template_string('Hello {{ current_user.username }}')
