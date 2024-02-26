@@ -32,6 +32,7 @@ app.config['SECURITY_EMAIL_SENDER'] = None
 app.config['SECURITY_USERNAME_ENABLE'] = True
 app.config['SECURITY_USERNAME_REQUIRED'] = True
 app.config["SECURITY_CONFIRMABLE"] = False
+app.config["SECURITY_RECOVERABLE"] = True
 # routing
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
