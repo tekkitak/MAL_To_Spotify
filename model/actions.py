@@ -1,15 +1,13 @@
 from flask import Flask
-from typing import cast
-import click
 from flask.cli import with_appcontext
-from model.database import db, DB_VER
-from model.version_control import verControl
+from typing import cast
 from os import getenv, system, path, makedirs
 from shutil import copyfile
-from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists
+import click
 
-SQLEngine = create_engine(getenv('DATABASE_URL'))
+from model.database         import db, DB_VER
+from model.version_control  import verControl
 
 
 def register_commands(app: Flask):
@@ -20,17 +18,21 @@ def register_commands(app: Flask):
         if input('Do you want to change .env? [y/N] ').lower() == 'y':
             copyfile('.env', '.env.bak')
             copyfile('example.env', '.env')
+        if input('Do you want to initialize the database? [y/N] ').lower() == 'y':
+            db_init()
         print('Python setup complete')
+
 
     @app.cli.command(help='Initialize the database')
     @with_appcontext
     def db_init():
-        if not database_exists(SQLEngine.url):
+        if not database_exists(db.engine.url):
             db.create_all()
 
         verControl.update('db_ver', str(DB_VER))
         verControl.save()
         click.echo('Database initialized')
+
 
     @app.cli.command(help='Drop the database')
     @with_appcontext
@@ -40,6 +42,7 @@ def register_commands(app: Flask):
         verControl.update('db_ver', None)
         verControl.save()
         click.echo('Database dropped')
+
 
     @app.cli.command(help='Archive the database')
     @with_appcontext
