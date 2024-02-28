@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template_string, current_app as app, render_template
 from model.database import db
 from flask_security import user_registered, auth_required, hash_password, current_user
+from crypt import methods
 
 
 user = Blueprint(
@@ -55,3 +56,9 @@ def user_registered_sighandler(**args) -> None:
 def delete_account():
     dir(current_user)
     # db.session.delete(current_user)
+
+
+@user.route('edit_profile', methods=['POST'])
+@auth_required()
+def edit_profile():
+    pass
