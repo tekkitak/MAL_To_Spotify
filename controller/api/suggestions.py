@@ -5,8 +5,8 @@ from controller.api.spotify import get_song_info
 from urllib.parse import unquote
 
 
-suggestions = Blueprint('suggestions', __name__, 
-                        template_folder='templates/api/suggestions', 
+suggestions = Blueprint('suggestions', __name__,
+                        template_folder='templates/api/suggestions',
                         url_prefix='/suggestions')
 
 
@@ -34,32 +34,32 @@ def AddSuggestion():
         return 'No spotify uri or opening id provided', 400
     spotify_uri:str = data['spotify_uri']
     opening_id:int = int(data['opening_id'])
-    opening = Opening.query.filter_by(id=opening_id).first()
+    opening:Opening | None = Opening.query.filter_by(id=opening_id).first()
 
 
     #if spotify uri is link, extract uri
     if spotify_uri.startswith('https:'):
         spotify_uri = "spotify:track:" + extractSpotifyUri(unquote(spotify_uri))
-    
+
     #check if opening exists
-    if opening == None:
+    if opening is None:
         return 'Opening not found', 404
     song = Song.query.filter_by(spotify_link=spotify_uri).first()
-    if song != None:
+    if song is not None:
         return 'Song already exists', 409
     #search spotify for song info
     res = get_song_info(spotify_uri)
 
     if res is None:
         return 'Song not found', 404
-    
+
     #check if artist exists
     artist = Artist.query.filter_by(artist_name=res['album']['artists'][0]['name']).first()
     if artist == None:
         #create artist
         artist = Artist(artist_name=res['album']['artists'][0]['name'])
         db.session.add(artist)
-    
+
     #create song
     print(f"Creating song {res['name']} by {res['album']['artists'][0]['name']}")
     song = Song(
