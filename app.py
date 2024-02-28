@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, session
 from datetime import datetime
+from flask_security.signals import user_registered
 
 from model.extensions       import register_extensions
 from model.actions          import register_commands
@@ -61,3 +62,10 @@ def index():
                            MAL_OAuth_url=url_for('api.mal.malAuth'),
                            playlists=playlists
                            )
+
+
+@user_registered.connect_via(app)
+def user_registered_sighandler(sender, user, **extra) -> None:
+    if not app.security.datastore.add_role_to_user(user, 'user'):
+        raise ValueError("Could not add user role to User.")
+    print(f"User {user.username} registered and added to user role.")
