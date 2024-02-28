@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template_string, current_app as app
+from flask import Blueprint, render_template_string, current_app as app, render_template
 from model.database import db
-from flask_security import user_registered, auth_required, hash_password
+from flask_security import user_registered, auth_required, hash_password, current_user
 
 
 user = Blueprint(
@@ -41,10 +41,17 @@ def test():
 
 @user.route('/profile')
 @auth_required()
-def profile() -> None:
-    pass
+def profile():
+    return render_template('user/profile.j2')
 
 
 @user_registered.connect_via(user)
 def user_registered_sighandler(**args) -> None:
     print(user)
+
+
+@user.route('delete_account')
+@auth_required()
+def delete_account():
+    dir(current_user)
+    # db.session.delete(current_user)

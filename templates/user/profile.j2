@@ -1,0 +1,41 @@
+{% extends "base.j2" %}
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+<div class="container rounded mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3 border-right">
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                <img class="rounded-circle mt-5" width="150px"
+                    src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                <span class="font-weight-bold">{{ current_user.username }}</span>
+                <span class="text-black-50">{{ current_user.email }}</span><span> </span>
+            </div>
+        </div>
+        <div class="col-md-5 border-right">
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center"><span>My authenicated apps</span></div><br>
+                <div class="d-flex flex-direction-column col-md-12">
+                    <div>
+                        <label class="labels" for="mal">MyAnimeList</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <input id="mal" type="text" class="form-control lists-form" placeholder="MyAnimeList"
+                                value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="button-menu" class="d-flex justify-content-around">
+        <div class="d-flex gap-3">
+            <a href="#" class="btn btn-primary">Edit Profile</a>
+            <a href="#" class="btn btn-danger">Delete Profile</a>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock content %}
