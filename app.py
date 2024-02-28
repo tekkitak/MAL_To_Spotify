@@ -6,6 +6,7 @@ from model.actions          import register_commands
 from model.config           import set_config
 from model.helper_functions import refresh_auth
 from model.database         import db, DB_VER
+from model.roles            import init_roles, ROLE_VER
 from model.version_control  import verControl
 from controller.error       import error
 from controller.user        import user
@@ -38,7 +39,14 @@ def check_version() -> None:
         else:
             print("Quitting...")
             exit()
-        verControl.save()
+    if not verControl.compare('role_ver', str(ROLE_VER)):
+        print("**Initing roles**")
+        print(f"Status: {init_roles(app.security.datastore)}")
+        verControl.update('role_ver', str(ROLE_VER))
+    else:
+        print("skipped role init")
+
+    verControl.save()
 
 
 @app.route('/')
@@ -53,4 +61,3 @@ def index():
                            MAL_OAuth_url=url_for('api.mal.malAuth'),
                            playlists=playlists
                            )
-

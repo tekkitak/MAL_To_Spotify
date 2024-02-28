@@ -40,6 +40,7 @@ def register_commands(app: Flask):
         db.drop_all()
 
         verControl.update('db_ver', None)
+        verControl.update('role_ver', None)
         verControl.save()
         click.echo('Database dropped')
 
