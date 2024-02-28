@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template_string, current_app as app
 from model.database import db
-from flask_security import user_registered, auth_required, hash_password
+from flask_security.utils      import hash_password
+from flask_security.signals    import user_registered
+from flask_security.decorators import auth_required
 
 
 user = Blueprint(
@@ -47,4 +49,4 @@ def profile() -> None:
 
 @user_registered.connect_via(user)
 def user_registered_sighandler(**args) -> None:
-    print(user)
+    print(f"User created\targs: {args=}")
