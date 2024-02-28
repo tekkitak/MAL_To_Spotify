@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template_string, current_app as app
+from flask import Blueprint, render_template_string, current_app as app, redirect
 from model.database import db
 from flask_security.utils      import hash_password
-from flask_security.signals    import user_registered
 from flask_security.decorators import auth_required
+from flask_security            import current_user
 
 
 user = Blueprint(
@@ -16,10 +16,12 @@ user = Blueprint(
 @user.route('/cradmin')
 def cradmin():
     if not app.security.datastore.find_user(email="test@me.com"):
-        app.security.datastore.create_user(email="test@me.com",
-                                           password=hash_password("password"),
-                                           username="Admin",
-                                           active=True)
+        app.security.datastore.create_user(
+                email="test@me.com",
+                password=hash_password("password"),
+                username="Admin",
+                e=True
+        )
         db.session.commit()
         return 'Success'
     return 'Already exists'
@@ -45,8 +47,3 @@ def test():
 @auth_required()
 def profile() -> None:
     pass
-
-
-@user_registered.connect_via(user)
-def user_registered_sighandler(**args) -> None:
-    print(f"User created\targs: {args=}")
