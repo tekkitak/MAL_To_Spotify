@@ -22,7 +22,9 @@
   </div>
   {{ render_field_errors(login_user_form.csrf_token) }}
   <button type="submit" class="btn btn-primary">{{ _fsdomain('Login') }}</button>
-  <a href="{{ url_for_security('forgot_password') }}">{{ _fsdomain('Forgot password?') }}</a>
+  <!-- <a href="{{ url_for_security('forgot_password') }}">{{ _fsdomain('Forgot password?') }}</a> -->
+  <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for_security('forgot_password') }}'">{{ _fsdomain('Forgot password?') }}</button>
+
 </form>
 {% endblock %}
 

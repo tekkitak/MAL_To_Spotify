@@ -1,0 +1,69 @@
+{% extends "base.j2" %}
+
+
+{% block head %}
+<script src="{{ url_for('static', filename='js/user/profile.js') }}"></script>
+{% endblock %}
+
+
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+<form id="edit-profile-form" method="POST" action="{{ url_for('user.edit_profile') }}">
+    <input type="hidden" name="user_id" value="{{ current_user.id }}">
+    <div class="container rounded mt-5 mb-5">
+        <div class="row">
+            <div class="col-md-3 border-right">
+                <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                    <img class="rounded-circle mt-5" width="150px"
+                        src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg">
+                    <span class="font-weight-bold">{{ current_user.username }}</span>
+                    <span class="text-black-50">{{ current_user.email }}</span><span> </span>
+                </div>
+            </div>
+            <div class="col-md-5 border-right">
+
+                <div class="d-flex justify-content-between align-items-center h4"><span>My profile</span></div>
+                <br>
+                <label class="labels" for="username">Username</label>
+                <div class="d-flex justify-content-between align-items-center">
+                    <input id="username" type="text" class="form-control user-form" name="username" placeholder="Username"
+                        value="{{ current_user.username }}" disabled>
+                </div>
+                <label class="labels" for="email">Email</label>
+                <div class="d-flex justify-content-between align-items-center">
+                    <input id="email" type="text" class="form-control user-form" name="email" placeholder="Email"
+                        value="{{ current_user.email }}" disabled>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center h4"><span>My authenicated apps</span></div>
+                <br>
+                <div class="d-flex flex-direction-column col-md-12">
+                    <div>
+                        <label class="labels" for="mal">MyAnimeList</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <input id="mal" type="text" class="form-control lists-form" placeholder="MyAnimeList" name="mal"
+                                value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="button-menu" class="d-flex justify-content-around">
+            <div id="default-buttons">
+                <div class="d-flex gap-3">
+                    <a id="edit-profile-btn" href="#" class="btn btn-primary">Edit Profile</a>
+                    <a id="delete-account-btn" href="#" class="btn btn-danger">Delete Account</a>
+                </div>
+            </div>
+            <div id="edit-buttons" style="display: none;">
+                <div class="d-flex gap-3">
+                    <button id="save-profile-btn" href="#" class="btn btn-primary">Save Profile</button>
+                    <a id="cancel-edit-profile-btn" href="#" class="btn btn-danger">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content %}
