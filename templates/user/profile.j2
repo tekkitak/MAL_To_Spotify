@@ -23,6 +23,8 @@
             </div>
             <div class="col-md-5 border-right">
 
+                <div class="d-flex justify-content-between align-items-center h4"><span>My profile</span></div>
+                <br>
                 <label class="labels" for="username">Username</label>
                 <div class="d-flex justify-content-between align-items-center">
                     <input id="username" type="text" class="form-control user-form" name="username" placeholder="Username"
@@ -35,16 +37,14 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="p-3 py-5">
-                    <div class="d-flex justify-content-between align-items-center"><span>My authenicated apps</span></div>
-                    <br>
-                    <div class="d-flex flex-direction-column col-md-12">
-                        <div>
-                            <label class="labels" for="mal">MyAnimeList</label>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <input id="mal" type="text" class="form-control lists-form" placeholder="MyAnimeList" name="mal"
-                                    value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
-                            </div>
+                <div class="d-flex justify-content-between align-items-center h4"><span>My authenicated apps</span></div>
+                <br>
+                <div class="d-flex flex-direction-column col-md-12">
+                    <div>
+                        <label class="labels" for="mal">MyAnimeList</label>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <input id="mal" type="text" class="form-control lists-form" placeholder="MyAnimeList" name="mal"
+                                value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
                         </div>
                     </div>
                 </div>
