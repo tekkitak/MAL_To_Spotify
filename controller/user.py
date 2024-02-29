@@ -57,7 +57,9 @@ def user_registered_sighandler(**args) -> None:
 @user.route('/delete_account')
 @auth_required()
 def delete_account():
-    db.session.delete(current_user)
+    c_user = User.query.filter_by(id=current_user.id).first()
+    db.session.delete(c_user)
+    db.session.commit()
     return redirect(url_for('security.logout'))
 
 
