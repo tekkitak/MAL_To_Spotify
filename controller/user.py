@@ -1,8 +1,11 @@
-from flask import Blueprint, render_template_string, current_app as app, redirect, url_for, request, render_template
+"""This module contains the user blueprint and edpoints for the application."""
+from flask import Blueprint, current_app as app, redirect, url_for, request, render_template
+from flask_login import current_user
+from flask_security.signals import user_registered
+from flask_security.decorators import auth_required
+from flask_security.utils import hash_password
+
 from model.database import db, User
-from flask_security import user_registered, auth_required, hash_password, current_user
-from crypt import methods
-from flask.helpers import redirect, url_for
 
 
 user = Blueprint(
@@ -14,7 +17,8 @@ user = Blueprint(
 
 
 @user.route('/cradmin')
-def cradmin():
+def cradmin() -> str:
+    """Creates an admin user for testing purposes."""
     if not app.security.datastore.find_user(email="test@me.com"):
         app.security.datastore.create_user(
                 email="test@me.com",
@@ -27,36 +31,23 @@ def cradmin():
     return 'Already exists'
 
 
-@user.route('/test')
-@auth_required()
-def test():
-    page = """
-    Hello {{ current_user.username }}
-    <br>
-    Roles:
-    <ul>
-    {% for role in current_user.roles%}
-        <li>{{role.name}}</li>
-    {% endfor %}
-    </ul>
-    """
-    return render_template_string(page)
-
-
 @user.route('/profile')
 @auth_required()
-def profile():
+def profile() -> str:
+    """Returns the profile page for the user"""
     return render_template('user/profile.j2')
 
 
 @user_registered.connect_via(user)
 def user_registered_sighandler(**args) -> None:
+    """Handles the user_registered signal"""
     print(user)
 
 
 @user.route('/delete_account')
 @auth_required()
 def delete_account():
+    """Deletes the account of the current user and logs them out."""
     c_user = User.query.filter_by(id=current_user.id).first()
     db.session.delete(c_user)
     db.session.commit()
@@ -66,6 +57,13 @@ def delete_account():
 @user.route('/edit_profile', methods=['POST'])
 @auth_required()
 def edit_profile():
+    """
+    Edits the profile of the current user.
+    This is a POST request that takes the following parameters:
+    - user_id: The id of the user to edit
+    - username: The new username
+    - email: The new email
+    """
     print(dir(request))
     data: dict[str, str] = request.form
     if not 'user_id' in data:
