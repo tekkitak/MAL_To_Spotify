@@ -12,6 +12,7 @@ $().ready(function() {
                 return JSON.stringify(json);
             }
         },
+        dom: '<"dt-entries-control"l>frti<"dt-paging-controls"p>',
         processing: true,
         serverSide: true,
         columns: [

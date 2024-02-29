@@ -54,3 +54,18 @@ body {
     }
 
 }
+
+.dt-paging-controls li {
+    /* display: inline; */
+    padding: .1rem !important;
+}
+
+.dt-paging-controls li a{
+    margin: 0 !important;
+}
+
+.dt-entries-control select{
+    width: 4rem !important;
+    padding-left: .5rem !important;
+
+}
