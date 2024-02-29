@@ -20,13 +20,17 @@ user = Blueprint(
 def cradmin() -> str:
     """Creates an admin user for testing purposes."""
     if not app.security.datastore.find_user(email="test@me.com"):
-        app.security.datastore.create_user(
+        adminUser = app.security.datastore.create_user(
                 email="test@me.com",
                 password=hash_password("password"),
                 username="Admin",
-                e=True
+                active=True
         )
-        db.session.commit()
+        app.security.datastore.add_role_to_user(
+                adminUser,
+                'admin'
+        )
+        app.security.datastore.commit()
         return 'Success'
     return 'Already exists'
 
