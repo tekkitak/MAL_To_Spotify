@@ -8,7 +8,7 @@ admin = Blueprint('admin', __name__,
                     url_prefix='/admin')
 
 @admin.route('/getUsers')
-# @permissions_required('user-manage')
+@permissions_required('user-manage')
 def users() -> str:
     """
     Returns a list of users
