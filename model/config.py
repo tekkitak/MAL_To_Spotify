@@ -18,14 +18,14 @@ def set_config(app) -> None:
         'SECURITY_EMAIL_SENDER': None,
         'SECURITY_USERNAME_ENABLE': True,
         'SECURITY_USERNAME_REQUIRED': True,
-        "SECURITY_CONFIRMABLE": False,
-        "SECURITY_RECOVERABLE": True,
-        "SECURITY_WAN_ALLOW_AS_FIRST_FACTOR": True,
+        'SECURITY_CONFIRMABLE': False,
+        'SECURITY_RECOVERABLE': True,
+        'SECURITY_WAN_ALLOW_AS_FIRST_FACTOR': True,
+        'SECURITY_OAUTH_ENABLE': True,
 
-        "SQLALCHEMY_ENGINE_OPTIONS": {
+        'SQLALCHEMY_ENGINE_OPTIONS': {
             "pool_pre_ping": True,
             },
         'SQLALCHEMY_DATABASE_URI': getenv('DATABASE_URL'),
-        "SQLALCHEMY_TRACK_MODIFICATIONS": False
+        'SQLALCHEMY_TRACK_MODIFICATIONS': False,
     })
-
