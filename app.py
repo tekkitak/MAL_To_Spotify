@@ -21,11 +21,8 @@ app = Flask(__name__)
 set_config(app)
 register_commands(app)
 register_extensions(app)
-
-app.register_blueprint(error)
-app.register_blueprint(api)
-app.register_blueprint(user)
-app.register_blueprint(admin)
+for blueprint in [error, api, user, admin]:
+    app.register_blueprint(blueprint)
 
 
 @app.before_first_request
