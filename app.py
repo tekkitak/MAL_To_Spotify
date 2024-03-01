@@ -12,6 +12,7 @@ from model.version_control  import verControl
 from controller.error       import error
 from controller.user        import user
 from controller.api_root    import api
+from controller.admin       import admin
 from controller.api.spotify import spotify_playlists
 
 
@@ -24,6 +25,7 @@ register_extensions(app)
 app.register_blueprint(error)
 app.register_blueprint(api)
 app.register_blueprint(user)
+app.register_blueprint(admin)
 
 
 @app.before_first_request

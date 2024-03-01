@@ -1,0 +1,38 @@
+{% extends "base.j2" %}
+
+{% block title %}User{% endblock %}
+
+{% block content %}
+    <form method="post" action="/api/admin/editUser">
+        <input type="hidden" name="id" value="{{ user.id }}">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="form-group">
+            <label for="roles">Roles</label>
+            {% for role in roles %}
+                <div class="form-check d-flex">
+                    <input class="form-check" type="checkbox" id="role_{{ role.id }}" name="role_{{ role.id }}" value="{{ role.id }}"
+                    {% if role in user.roles %}
+                        checked
+                    {% endif %}>
+                    <label class="form-check
+                    {% if role in user.roles %}
+                        text-primary
+                    {% endif %}" for="role_{{ role.id }}">{{ role.name }}</label>
+                </div>
+            {% endfor %}
+
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+{% endblock %}
