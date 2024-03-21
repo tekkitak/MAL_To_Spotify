@@ -9,4 +9,5 @@ instance/**
 virtual.env
 .gitignore
 pymyenv/
+venv/
 .version
