@@ -20,5 +20,4 @@ def user(id):
     for role in r:
         role.user_has = role in u.roles
 
-
     return render_template('admin/user.j2', user=u, roles=r)

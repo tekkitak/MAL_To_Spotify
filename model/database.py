@@ -87,6 +87,12 @@ class User(db.Model, fsqla.FsUserMixin):
     def __repr__(self) -> str:
         return f'<User {self.id}, {self.username}, {self.password}, {self.myanimelist_id}>'
 
+    def has_role(self, role) -> bool:
+        return role in self.roles
+
+    def print_roles(self) -> str:
+        return ', '.join(role.name for role in self.roles)
+
 
 class Role(db.Model, fsqla.FsRoleMixin):
     __tablename__ = 'role'
