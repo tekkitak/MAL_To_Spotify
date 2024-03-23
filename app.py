@@ -1,3 +1,4 @@
+from typing import cast
 from flask import Flask, render_template, url_for, session
 from datetime import datetime
 from flask_security.signals import user_registered
@@ -5,10 +6,10 @@ from flask_security.signals import user_registered
 from model.extensions import register_extensions
 from model.actions import register_commands
 from model.config import set_config
-from model.helper_functions import refresh_auth
 from model.database import db, DB_VER
 from model.roles import init_roles, ROLE_VER
 from model.version_control import verControl
+from model.oauth2 import OAuth2
 from controller.error import error
 from controller.user import user
 from controller.api_root import api
@@ -52,9 +53,9 @@ def check_version() -> None:
 @app.route("/")
 def index():
     playlists = []
-    if session.get("spotify_access_token", False) is not False:
-        if session["token_expiration_time"] < datetime.now():
-            refresh_auth()
+    if session.get("spotify_oauth", False) is not False:
+        if not cast(OAuth2, session["spotify_oauth"]).token_valid():
+            session["spotify_oauth"].token_from_refresh()
         playlists = spotify_playlists()["items"]
     return render_template(
         "index.j2",

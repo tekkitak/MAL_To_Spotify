@@ -139,10 +139,20 @@ class OAuth2(AuthBase):
 
 def MalOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> OAuth2:
     return OAuth2(
-        client_id,
-        client_secret,
-        redirect_url,
-        "https://myanimelist.net/v1/oauth2/authorize",
-        "https://myanimelist.net/v1/oauth2/token",
-        "plain",
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_url,
+        oauth_url="https://myanimelist.net/v1/oauth2/authorize",
+        token_url="https://myanimelist.net/v1/oauth2/token",
+        method="plain",
+    )
+
+def SpotifyOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> OAuth2:
+    return OAuth2(
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_uri=redirect_url,
+        oauth_url="https://accounts.spotify.com/authorize",
+        token_url="https://accounts.spotify.com/api/token",
+        method="S256",
     )
