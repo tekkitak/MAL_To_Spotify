@@ -34,6 +34,11 @@
                                     <li class="dropdown-item">
                                         <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
                                     </li>
+                                    {% if current_user.has_role('admin') %}
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ url_for('admin.users') }}">Users panel</a>
+                                    </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
