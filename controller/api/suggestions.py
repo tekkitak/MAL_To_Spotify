@@ -1,7 +1,9 @@
 from flask import Blueprint, request
-from model.database import db, Song, Opening, Artist
+from flask_login import current_user
+from model.database import db, Song, Opening, Artist, Vote
 import json
 from controller.api.spotify import get_song_info
+from flask_security.decorators import permissions_required
 from urllib.parse import unquote
 
 
@@ -19,6 +21,7 @@ def GetSuggestions(opening_id: int):
     out: list[dict[str, str | int]] = []  # Explicitly define the types of dictionary keys and values
     for song in opening.songs:
         out.append({
+            'song_id': song.id,
             'song_title': song.song_title,
             'artist': song.artist.artist_name,
             'spotify_link': song.spotify_link,
@@ -76,3 +79,26 @@ def AddSuggestion():
 
 def extractSpotifyUri(spotify_link: str) -> str:
     return spotify_link.split('/')[-1].split('?')[0]
+
+@suggestions.route('/vote', methods = ['POST'])
+@permissions_required('suggestion-vote')
+def vote():
+    data = request.get_json()
+    print(data)
+    if 'song_id' not in data or 'vote' not in data:
+        return 'No song id or vote provided', 400
+    song_id:int = int(data['song_id'])
+    new_vote:int = int(data['vote'])
+    song:Song | None = Song.query.filter_by(id=song_id).first()
+    if song is None:
+        return 'Song not found', 404
+    if new_vote not in [0, 1, -1]:
+        return 'Invalid vote', 400
+    vote = Vote.query.filter_by(song_id=song_id, user_id=current_user.id).first()
+    if vote is None:
+        vote = Vote(song_id=song_id, user_id=current_user.id, vote=new_vote)
+        db.session.add(vote)
+    else:
+        vote.vote = new_vote
+    db.session.commit()
+    return 'Vote added', 200

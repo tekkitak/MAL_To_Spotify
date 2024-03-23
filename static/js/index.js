@@ -171,7 +171,7 @@ $().ready(function () {
                             <div class='custom-modal-header-left'>
                                 <h3>${row.title}</h3>
                                 <h5>${row.op_title}</h5>
-                            </div>  
+                            </div>
                             <div class='custom-modal-header-right align-self-right'>
                                 <input type='button' class='btn btn-sm btn-danger' id='custom-modal-close-btn' value='Close'>
                             </div>
@@ -187,7 +187,7 @@ $().ready(function () {
                                 }
                                 modal +=`</div>
                             <div class='custom-modal-body-right m-3 flex-grow-1'>
-                                <h5>Suggestions</h5> 
+                                <h5>Suggestions</h5>
                                 <table class='w-100'>
                                     <colgroup>
                                         <col span='1' >
@@ -203,7 +203,7 @@ $().ready(function () {
                                     success: function (data) {
                                         suggestions = JSON.parse(data);
                                         suggestions.forEach( function( suggestion, index ) {
-                                            upvotes = suggestion.upvotes??0;
+                                            upvotes = suggestion.votes??0;
                                             modal +=`
                                             <tr>
                                             <td>${upvotes}</td>
@@ -214,12 +214,12 @@ $().ready(function () {
                                                     <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
                                                 </svg>
                                             </button></td>
-                                            <td><button id='suggestion-upvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <td><button id='suggestion-upvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn suggestion-upvote-btn' data-uri='${suggestion.spotify_link}' data-sid='${suggestion.song_id}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16">
                                                     <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
                                                 </svg>
                                             </button></td>
-                                            <td><button id='suggestion-downvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn' data-uri='${suggestion.spotify_link}'>
+                                            <td><button id='suggestion-downvote-btn-${index}' class='btn btn-sm btn-outline-primary custom-modal-suggestion-btn suggestion-downvote-btn' data-uri='${suggestion.spotify_link}' data-sid='${suggestion.song_id}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
                                                     <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                                 </svg>
@@ -228,7 +228,7 @@ $().ready(function () {
                                             <td class='d-none'>${suggestion.artist}</td>
                                             </tr>`
                                         });
- 
+
                                     },
                                     error: function (data) {
                                         console.log(data);
@@ -348,5 +348,36 @@ $().ready(function () {
         dataTable.fnUpdate(row, $('#custom-modal-btn-' + opening_id).closest('tr'));
         $('#custom-modal').hide();
     });
+
+    async function vote (id, vote) {
+        $.ajax({
+            url: '/api/suggestions/vote',
+            data: JSON.stringify({
+                song_id: id,
+                vote: vote
+            }),
+            contentType: 'application/json',
+            type: 'POST',
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (data) {
+                console.log(data);
+            },
+
+        })
+    }
+
+    $('body').on('click', '.suggestion-upvote-btn', function () {
+        suggestion_id = $(this).attr('data-sid');
+        vote(suggestion_id, 1);
+    });
+
+    $('body').on('click', '.suggestion-downvote-btn', function () {
+        suggestion_id = $(this).attr('data-sid');
+        vote(suggestion_id, -1);
+    });
+
+
 
 });
