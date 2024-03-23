@@ -69,3 +69,7 @@ body {
     padding-left: .5rem !important;
 
 }
+
+.body-container{
+    min-height: calc(100vh - 100px);
+}
