@@ -74,7 +74,7 @@ class OAuth2(AuthBase):
         if self.client_data["scope"] is not None:
             params["scope"] = self.client_data["scope"]
 
-        if self.code_challenge["method"] is None:
+        if self.code_challenge["method"] is not None:
             if not self.challenge_valid():
                 self.renew_challenge()
             params["code_challenge_method"] = self.code_challenge["method"]
@@ -146,6 +146,7 @@ def MalOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> O
         token_url="https://myanimelist.net/v1/oauth2/token",
         method="plain",
     )
+
 
 def SpotifyOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> OAuth2:
     return OAuth2(
