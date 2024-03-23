@@ -30,6 +30,7 @@ def GetSuggestions(opening_id: int):
     return json.dumps(out), 200
 
 @suggestions.route('/addSuggestion', methods = ['POST'])
+@permissions_required('suggestion-create')
 def AddSuggestion():
     data = request.get_json()
     print(data)
