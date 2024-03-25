@@ -54,8 +54,6 @@ def check_version() -> None:
 def index():
     playlists = []
     if session.get("spotify_oauth", False) is not False:
-        if not cast(OAuth2, session["spotify_oauth"]).token_valid():
-            session["spotify_oauth"].token_from_refresh()
         playlists = spotify_playlists()["items"]
     return render_template(
         "index.j2",
