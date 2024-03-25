@@ -11,5 +11,6 @@ virtual.env
 pymyenv/
 .version
 setup.cfg
+venv/
 
 **/dep_spotify.py
