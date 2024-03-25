@@ -199,4 +199,5 @@ def SpotifyOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) 
         oauth_url="https://accounts.spotify.com/authorize",
         token_url="https://accounts.spotify.com/api/token",
         method="S256",
+        scope="playlist-read-private", # Appended to default scope
     )
