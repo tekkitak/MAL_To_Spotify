@@ -99,6 +99,8 @@ def get_spotify_song(name: str, artist: str):
     }
     res = rq.get(url=url, headers=headers, params=params, auth=Oauth, timeout=150)
     res = res.json()
+    if res["tracks"]["total"] == 0:
+        return None
     return {
         "uri": res["tracks"]["items"][0]["uri"],
         "artist": res["tracks"]["items"][0]["artists"][0]["name"],

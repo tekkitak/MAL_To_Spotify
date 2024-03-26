@@ -31,7 +31,7 @@
         {% if session.get('mal_oauth', 'Empty') == 'Empty': %}
         <p>This is OAuth <a href="{{MAL_OAuth_url}}">link</a> to auth MAL</p>
         {% else%}
-        {% if session.get('spotify_access_token', 'Empty') != 'Empty': %}
+        {% if session.get('spotify_oauth', 'Empty') != 'Empty': %}
         <div class="table-enclosure">
             <table id="openings_table" class="display compact table table-hover table-bordered border-light-subtle"></table>
                 <thead>
