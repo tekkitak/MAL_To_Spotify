@@ -15,7 +15,7 @@ spotify = Blueprint(
 
 @spotify.route("/auth")
 def spotifyAuth():
-    ''''Authenticate Spotify API'''
+    '''Authenticate Spotify API'''
     if session.get("spotify_oauth", None) is None:
         session["spotify_oauth"] = SpotifyOAuth2Builder(
             client_id = getenv("SPOT_ID"),
@@ -82,7 +82,6 @@ def playlist_add_song(playlist_id: str, uris: str):
     req = rq.post(url=url, headers=headers, json=data, auth=Oauth, timeout=150)
     return req.json()
 
-@spotify.route("/getSongUri/<string:name>/<string:artist>")
 def get_spotify_song(name: str, artist: str):
     '''Get a song URI'''
     Oauth: Optional[OAuth2] = cast(Optional[OAuth2], session.get("spotify_oauth", None))
@@ -119,7 +118,6 @@ def spotify_playlists():
         "Content-Type": "application/json"
     }
     res = rq.get(url=url, headers=headers, auth=Oauth, timeout=150)
-    print(res.json())
     return res.json()
 
 def create_spotify_song(op: Opening) -> bool:
@@ -151,13 +149,9 @@ def get_song_info(spotify_uri: str):
     '''Get song info'''
     url = f"https://api.spotify.com/v1/tracks/{spotify_uri.split(':')[2]}"
 
-    token_type, access_token = (
-        session["spotify_token_type"],
-        session["spotify_access_token"],
-    )
     headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"{token_type} {access_token}",
+        "Authorization": session["spotify_oauth"].get_Bearer(),
+        "Content-Type": "application/json"
     }
     response = cast(rq.Response, rq.get(url, headers=headers))
 
