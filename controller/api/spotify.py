@@ -64,7 +64,7 @@ def get_spotify_user_profile() -> dict[str, Any]:
     req = rq.get(url=url, headers=headers, auth=Oauth, timeout=150)
     return req.json()
 
-@spotify.route("/addSong/<string:playlist_id>/<string:uris>")
+@spotify.route("/addSongs/<string:playlist_id>/<string:uris>")
 def playlist_add_song(playlist_id: str, uris: str):
     '''Add a song to a playlist'''
     Oauth: Optional[OAuth2] = cast(Optional[OAuth2], session.get("spotify_oauth", None))
