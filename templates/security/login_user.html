@@ -24,6 +24,7 @@
   <button type="submit" class="btn btn-primary">{{ _fsdomain('Login') }}</button>
   <!-- <a href="{{ url_for_security('forgot_password') }}">{{ _fsdomain('Forgot password?') }}</a> -->
   <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for_security('forgot_password') }}'">{{ _fsdomain('Forgot password?') }}</button>
+  <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ url_for('user.check_oauth_login') }}'">Login with OAuths</button>
 
 </form>
 {% endblock %}

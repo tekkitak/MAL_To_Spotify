@@ -1,15 +1,12 @@
-from typing import cast
 from flask import Flask, render_template, url_for, session
-from datetime import datetime
 from flask_security.signals import user_registered
 
 from model.extensions import register_extensions
 from model.actions import register_commands
 from model.config import set_config
-from model.database import db, DB_VER
+from model.database import DB_VER
 from model.roles import init_roles, ROLE_VER
 from model.version_control import verControl
-from model.oauth2 import OAuth2
 from controller.error import error
 from controller.user import user
 from controller.api_root import api

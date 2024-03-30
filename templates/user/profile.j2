@@ -27,8 +27,8 @@
                 <br>
                 <label class="labels" for="username">Username</label>
                 <div class="d-flex justify-content-between align-items-center">
-                    <input id="username" type="text" class="form-control user-form" name="username" placeholder="Username"
-                        value="{{ current_user.username }}" disabled>
+                    <input id="username" type="text" class="form-control user-form" name="username"
+                        placeholder="Username" value="{{ current_user.username }}" disabled>
                 </div>
                 <label class="labels" for="email">Email</label>
                 <div class="d-flex justify-content-between align-items-center">
@@ -37,56 +37,36 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="d-flex justify-content-between align-items-center h4 mb-4"><span>My authenicated apps</span></div>
-                <div class="d-flex flex-column py-2 col-md-12">
-                    <div>
-                        <label class="labels" for="mal">MyAnimeList</label>
+                <div class="d-flex justify-content-between align-items-center h4 mb-4"><span>My authenicated apps</span>
+                </div>
+                <div class="d-flex flex-column py-4 col-md-12" style="padding-top: 1.8em !important">
+                {% for oauth in current_user.oauth2s %}
+                    <div class="oauth-{{ oauth.provider }} pb-1">
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" onchange="toggleEdit('mal')" class="form-check form-switch custom-control-input user-form"
-                                        id="mal-switch" disabled title="Toggle OAuth login">
-                                    </div>
-                                </div>
-                                <input id="mal" type="text" class="form-control list-form" placeholder="MyAnimeList" name="mal"
-                                value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
-                            </div>
-                    </div>
-
-                    <div>
-                        <label class="labels" for="mal">Spotify</label>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text">
-                                        <input type="checkbox" onchange="toggleEdit('spotify')" class="form-check form-switch custom-control-input user-form"
-                                        id="spotify-switch" disabled title="Toggle OAuth login">
-                                    </div>
-                                </div>
-                                <input id="spotify" type="text" class="form-control list-form" placeholder="Spotify" name="spotify"
-                                value="{{ current_user.myanimelist_id if current_user.myanimelist_id }}" disabled>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input user-form"
+                                name="{{ oauth.provider }}-switch" disabled {% if oauth.allow_login %}checked{% endif %}>
+                                <label class="form-check-label">Toggle {{ oauth.provider }} auto login</label>
                             </div>
                         </div>
                     </div>
+                {% endfor %}
+                </div>
+            </div>
+            <div id="button-menu" class="d-flex justify-content-around">
+                <div id="default-buttons">
+                    <div class="d-flex gap-3">
+                        <a id="edit-profile-btn" href="#" class="btn btn-primary">Edit Profile</a>
+                        <a id="delete-account-btn" href="#" class="btn btn-danger">Delete Account</a>
+                    </div>
+                </div>
+                <div id="edit-buttons" style="display: none;">
+                    <div class="d-flex gap-3">
+                        <button id="save-profile-btn" href="#" class="btn btn-primary">Save Profile</button>
+                        <a id="cancel-edit-profile-btn" href="#" class="btn btn-danger">Cancel</a>
+                    </div>
                 </div>
             </div>
         </div>
-        {{ current_user.oauth2s }}
-        <div id="button-menu" class="d-flex justify-content-around">
-            <div id="default-buttons">
-                <div class="d-flex gap-3">
-                    <a id="edit-profile-btn" href="#" class="btn btn-primary">Edit Profile</a>
-                    <a id="delete-account-btn" href="#" class="btn btn-danger">Delete Account</a>
-                </div>
-            </div>
-            <div id="edit-buttons" style="display: none;">
-                <div class="d-flex gap-3">
-                    <button id="save-profile-btn" href="#" class="btn btn-primary">Save Profile</button>
-                    <a id="cancel-edit-profile-btn" href="#" class="btn btn-danger">Cancel</a>
-                </div>
-            </div>
-        </div>
-    </div>
 </form>
 {% endblock content %}

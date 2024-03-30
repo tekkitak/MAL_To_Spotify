@@ -2,6 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_security.models import fsqla_v2 as fsqla
+import requests as rq
 
 db = SQLAlchemy()
 DB_VER = 1.3
@@ -142,10 +143,8 @@ class OAuth2(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     user = db.relationship("User", back_populates="oauth2s")
     provider = db.Column(db.String(128), nullable=False)
-    access_token = db.Column(db.String(128), nullable=False)
+    provider_user_id = db.Column(db.Integer, nullable=True)
     token_type = db.Column(db.String(128), nullable=False)
-    refresh_token = db.Column(db.String(128), nullable=False)
-    expires_at = db.Column(db.DateTime, nullable=False)
     allow_login = db.Column(db.Boolean, nullable=False)
 
 
