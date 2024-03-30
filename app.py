@@ -31,22 +31,13 @@ def check_version() -> None:
     """Checks for all the versioning done with versionControl"""
 
     if not verControl.compare("db_ver", str(DB_VER)):
-        MSG = "Database version mismatch. Do you want to update the database? (y/n)\n"
-        if input(MSG) == "y":
-            # FIXME: Extract into function that will be used by db_init and db_drop
-            db.drop_all()
-            db.create_all()
-            verControl.update("db_ver", str(DB_VER))
-        else:
-            print("Quitting...")
-            exit()
+        MSG = "Database version mismatch. Please run flask db-drop; flask db-init\n"
+        input(MSG)
+        exit()
     if not verControl.compare("role_ver", str(ROLE_VER)):
         print("**Initing roles**")
         print(f"Status: {init_roles(app.security.datastore)}")
         verControl.update("role_ver", str(ROLE_VER))
-    else:
-        print("skipped role init")
-
     verControl.save()
 
 

@@ -12,5 +12,5 @@ pymyenv/
 .version
 setup.cfg
 venv/
-
+*.sqlite
 **/dep_spotify.py
