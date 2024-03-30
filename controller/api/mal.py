@@ -57,11 +57,6 @@ def malGenerateOPList():
             anime = Anime(title=anime_title, mal_id=anime_id)
         else:
             anime = cast(Anime, cached)  # type: ignore
-        ## debug print...
-        print(anime.openings)
-        print(anime.title)
-        print("")
-        ## End of debug print
 
         # Check if anime is new or last updated more than a week ago
         check_date: datetime = datetime.now() - timedelta(weeks=1)
@@ -86,14 +81,8 @@ def malGenerateOPList():
                     ),
                 }
             ]  # type: ignore
-
     db.session.commit()
-    # {
-    #     "title": cached.anime_title,
-    #     "op_title": op.opening_title,
-    #     "op_artist": op.artist.name,
-    #     "op_uri": op.spotify_uri
-    #  }
+
     return json.dumps(json_out)
 
 
@@ -135,7 +124,7 @@ def updateAnimeOpeningsList(auth: OAuth2, anime: Anime) -> list[Any]:
         OAuth2 object for MAL
 
     anime
-        Anime object to get openings for (needs id set)
+        Anime to get openings for (must have id set)
     """
     anime_id = int(anime.mal_id)
     assert (
@@ -162,13 +151,8 @@ def updateAnimeOpeningsList(auth: OAuth2, anime: Anime) -> list[Any]:
             db.session.add(op)
             db_opening = op
 
-        # FIXME: Replace with magic function which asks spotify if none | gets from songs and returns uri
-        # find if any song exists
         if db_opening.GetBestSong() is None:
             create_spotify_song(db_opening)
-
-    # Ziskam openingy pro to anime
-    return []
 
 
 def parseOpStr(op_str: str) -> tuple[str, str, str]:

@@ -22,19 +22,19 @@ roles: list[dict] = [
 ]
 
 
-def init_roles(datastore: datastore) -> bool:
+def init_roles(data_store: datastore) -> bool:
     """
     Initializes roles
 
     Param:
-        datastore: Datastore - datastore to initialize in
+        data_store: Datastore - datastore to initialize in
 
     Returns:
         bool - True if init was succesful, False otherwise
     """
-    datastore.role_model.query.delete()
+    data_store.role_model.query.delete()
     for role in roles:
-        ret: bool = datastore.create_role(
+        ret: bool = data_store.create_role(
             name=role["name"],
             permissions=role["permissions"],
             description=role["description"],
@@ -42,5 +42,5 @@ def init_roles(datastore: datastore) -> bool:
         if not ret:
             return False
 
-    datastore.commit()
+    data_store.commit()
     return True
