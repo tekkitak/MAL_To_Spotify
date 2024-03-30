@@ -25,10 +25,12 @@ def register_commands(app: Flask):
     @app.cli.command(help="Initialize the database")
     @with_appcontext
     def db_init():
-        if not database_exists(db.engine.url):
-            db.create_all()
+        if database_exists(db.engine.url):
+            db.drop_all()
+        db.create_all()
 
         verControl.update("db_ver", str(DB_VER))
+        verControl.update("role_ver", None)
         verControl.save()
         click.echo("Database initialized")
 
