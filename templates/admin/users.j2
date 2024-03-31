@@ -1,0 +1,34 @@
+{% extends "base.j2" %}
+
+{% block title %}Users admin panel{% endblock %}
+
+{% block head %}
+    <script src="//cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.css"/>
+    <script src="https://cdn.datatables.net/v/dt/dt-1.13.3/b-2.3.5/b-colvis-2.3.5/b-html5-2.3.5/sr-1.2.1/datatables.min.js"></script>
+
+    <script src="{{ url_for('static', filename='dataTables.rowsGroup.js') }}"></script>
+
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.3/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/dataTables.bootstrap5.min.css">
+    <script src="/static/js/admin/users.js"></script>
+{% endblock  %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="">
+                <h1>Users admin panel</h1>
+                <table id="users" class="table table-hover">
+
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+

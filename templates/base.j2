@@ -34,6 +34,11 @@
                                     <li class="dropdown-item">
                                         <a class="nav-link" href="{{ url_for('security.logout') }}">Logout</a>
                                     </li>
+                                    {% if current_user.has_role('admin') %}
+                                    <li class="dropdown-item">
+                                        <a class="nav-link" href="{{ url_for('admin.users') }}">Users panel</a>
+                                    </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
@@ -46,7 +51,7 @@
                     </div>
                 </div>
             </nav>
-            <div class="body-container container bg-light min-vh-100 p-4">
+            <div class="body-container container bg-light p-4">
                 {% block content %} {% endblock %}
             </div>
             <div class="toast-container position-absolute top-0 end-0 p-5">
