@@ -117,6 +117,10 @@ $().ready(function () {
                     if (playlist_id == null) {
                         return;
                     }
+                    if (typeof playlist_id === 'object') {
+                        // FIXME: Hacknuté ať to funguje ale jestli tohle čte oponent tak si to vyřiďte s Matějem...
+                        playlist_id = playlist_id.id;
+                    }
                     //maximum number of songs that can be added to a playlist in one request is 100 so we need to split the uris array into chunks of 100
                     let chunk_size = 100;
                     for (let i = 0; i < uris.length; i += chunk_size) {

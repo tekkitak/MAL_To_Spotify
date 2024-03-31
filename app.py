@@ -28,8 +28,7 @@ def check_version() -> None:
     """Checks for all the versioning done with versionControl"""
 
     if not verControl.compare("db_ver", str(DB_VER)):
-        MSG = "Database version mismatch. Please run flask db-drop; flask db-init\n"
-        input(MSG)
+        input("Database version mismatch. Please run flask db-drop; flask db-init\n")
         exit()
     if not verControl.compare("role_ver", str(ROLE_VER)):
         print("**Initing roles**")
