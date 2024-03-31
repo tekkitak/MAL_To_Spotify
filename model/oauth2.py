@@ -43,6 +43,8 @@ class OAuth2(AuthBase):
         Return:
             OAuth2 object that you can call to get the Bearer Token
         """
+        if provider_name is None:
+            raise Exception("Provider name cannot be None")
         if method is None:  # type: ignore
             self.code_challenge = {"method": None, "expire": -1}
         elif method in ["plain", "S256"]:
