@@ -64,7 +64,10 @@ class VersionControl:
             new_value (str): New value to set
         """
         if new_value is None:
-            self.ver_content.pop(key)
+            try:
+                self.ver_content.pop(key)
+            except KeyError:
+                pass
         else:
             self.ver_content[key] = new_value
 

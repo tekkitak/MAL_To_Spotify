@@ -1,5 +1,7 @@
 """Oauth 2.0 Authorization Code Grant flow implementation that can be used as authorization for requests library"""
 import secrets
+from flask_security import current_user
+from model.database import OAuth2 as OAuth2Model, db
 from time import time
 from hashlib import sha256
 from base64 import b64encode as b64e
@@ -7,11 +9,14 @@ from urllib.parse import urlencode
 import requests as rq
 from requests.auth import AuthBase
 from typing import Optional
+from datetime import datetime
+from model.oauth_login import auto_login
 
 
 class OAuth2(AuthBase):
     def __init__(
         self,
+        provider_name: str,
         client_id: str,
         client_secret: str,
         redirect_uri: str,
@@ -47,6 +52,7 @@ class OAuth2(AuthBase):
             raise Exception("Invalid code challenge method")
 
         self.client_data = {
+            "provider": provider_name,
             "state": secrets.token_urlsafe(100)[:128],
             "id": client_id,
             "secret": client_secret,
@@ -62,6 +68,7 @@ class OAuth2(AuthBase):
         if not self.__token_valid():
             self.__token_from_refresh()
 
+        self._sync_into_db()
         req.headers["Authorization"] = self.get_Bearer()
         return req
 
@@ -144,6 +151,8 @@ class OAuth2(AuthBase):
         self.token["access"] = json["access_token"]
         self.token["refresh"] = json["refresh_token"]
         self.token["expire"] = time() + json["expires_in"]
+        self._sync_into_db()
+        auto_login(self.client_data["provider"], self.get_Bearer())
 
     def __token_from_refresh(self) -> None:
         """Gets the token from refresh token"""
@@ -162,12 +171,29 @@ class OAuth2(AuthBase):
 
         self.token["access"] = json["access_token"]
         self.token["expire"] = time() + json["expires_in"]
+        self._sync_into_db()
 
     def __token_valid(self) -> bool:
         """Internal function to check if the token is still valid"""
         if self.token["expire"] is None or self.token["access"] is None:
             return False
         return self.token["expire"] > time()
+
+    def _sync_into_db(self) -> None:
+        if not current_user.is_authenticated:
+            return  # Not logged in
+        if OAuth2Model.query.filter_by(provider=self.client_data["provider"], user=current_user).first():
+            print("Already Exists")
+            return  # Already Exists
+
+        oa2 = OAuth2Model(
+            user=current_user,
+            provider=self.client_data["provider"],
+            token_type="Bearer",
+            allow_login=False
+        )
+        db.session.add(oa2)
+        db.session.commit()
 
     def get_Bearer(self) -> str:
         """Get the Bearer token for the Authorization header"""
@@ -181,6 +207,7 @@ class OAuth2(AuthBase):
 def MalOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> OAuth2:
     """OAuth2 Builder for MyAnimeList"""
     return OAuth2(
+        provider_name="mal_oauth",
         client_id=client_id,
         client_secret=client_secret,
         redirect_uri=redirect_url,
@@ -193,6 +220,7 @@ def MalOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> O
 def SpotifyOAuth2Builder(client_id: str, client_secret: str, redirect_url: str) -> OAuth2:
     """OAuth2 Builder for Spotify"""
     return OAuth2(
+        provider_name="spotify_oauth",
         client_id=client_id,
         client_secret=client_secret,
         redirect_uri=redirect_url,
