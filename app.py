@@ -12,6 +12,7 @@ from controller.error import error
 from controller.user import user
 from controller.api_root import api
 from controller.admin import admin
+from controller.statistics import statistics
 from controller.api.spotify import spotify_playlists
 
 
@@ -20,7 +21,7 @@ app = Flask(__name__)
 set_config(app)
 register_commands(app)
 register_extensions(app)
-for blueprint in [error, api, user, admin]:
+for blueprint in [error, api, user, admin, statistics]:
     app.register_blueprint(blueprint)
 
 

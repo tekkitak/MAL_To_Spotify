@@ -164,13 +164,6 @@ class Sync(db.Model):
     last_synced_at = db.Column(db.DateTime, nullable=False)
 
 
-# anime_opening = db.Table(
-#     "anime_opening",
-#     db.Column("anime_id", db.Integer, db.ForeignKey("anime.id"), primary_key=True),
-#     db.Column("opening_id", db.Integer, db.ForeignKey("opening.id"), primary_key=True),
-#     db.Column("episodes", db.String(128), nullable=True),
-# )
-
 class Anime_opening(db.Model):
     __tablename__ = "anime_opening"
 
@@ -180,6 +173,7 @@ class Anime_opening(db.Model):
     opening = db.relationship("Opening", back_populates="anime_openings", overlaps="openings,animes")
     episodes = db.Column(db.String(128), nullable=True)
 
+
 class Import_song(db.Model):
     __tablename__ = "import_song"
 
@@ -188,7 +182,12 @@ class Import_song(db.Model):
     song_id = db.Column(db.Integer, db.ForeignKey("song.id"), primary_key=True)
 
     @classmethod
-    def stats_by_songs(cls)-> list[dict[str, str | int]]:
+    def stats_by_songs(cls, limit, offset) -> list[dict[str, str | int]]:
         """Get the count of imports by song"""
-        ret = db.session.query(Song, db.func.count(cls.import_id)).join(cls).group_by(cls.song_id).all()
-        return [{"song": song.song_title, "artist": song.artist.artist_name, "count": count} for song, count in ret]
+        ret = db.session.query(
+                    cls.song_id, Song.song_title, Artist.artist_name,
+                    db.func.count(cls.song_id).label("count")
+                ).select_from(cls).join(Song).join(Artist).group_by(
+                    cls.song_id, Song.song_title, Artist.artist_name
+                ).order_by(db.desc("count")).limit(limit).offset(offset).all()
+        return [{"id": song_id, "song": song_title, "artist": artist_name, "count": count} for song_id, song_title, artist_name, count in ret]
