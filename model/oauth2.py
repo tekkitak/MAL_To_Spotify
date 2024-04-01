@@ -1,6 +1,5 @@
 """Oauth 2.0 Authorization Code Grant flow implementation that can be used as authorization for requests library"""
 import secrets
-from flask import session
 from flask_security import current_user
 from model.database import OAuth2 as OAuth2Model, db
 from time import time
@@ -11,6 +10,11 @@ import requests as rq
 from requests.auth import AuthBase
 from typing import Optional
 from model.oauth_login import auto_login
+
+
+class RevokedToken(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class OAuth2(AuthBase):
@@ -169,9 +173,9 @@ class OAuth2(AuthBase):
         json = req.json()
 
         if json.get("error", None) is not None:
-            print(f"Error occured in {self.client_data['provider']} refresh token: {json}")
-            session.pop(self.client_data["provider"], None)
-            return
+            if json.get("error") == "invalid_grant":
+                raise RevokedToken(f"Token has been revoked: {json.get('error_description')}")
+            raise Exception(req.json())
 
         self.token["access"] = json["access_token"]
         self.token["expire"] = time() + json["expires_in"]
