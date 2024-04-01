@@ -9,8 +9,7 @@ instance/**
 virtual.env
 .gitignore
 pymyenv/
+venv/
 .version
 setup.cfg
-venv/
 *.sqlite
-**/dep_spotify.py
