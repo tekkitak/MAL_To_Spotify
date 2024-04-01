@@ -1,5 +1,6 @@
 """Oauth 2.0 Authorization Code Grant flow implementation that can be used as authorization for requests library"""
 import secrets
+from flask import session
 from flask_security import current_user
 from model.database import OAuth2 as OAuth2Model, db
 from time import time
@@ -9,7 +10,6 @@ from urllib.parse import urlencode
 import requests as rq
 from requests.auth import AuthBase
 from typing import Optional
-from datetime import datetime
 from model.oauth_login import auto_login
 
 
@@ -169,7 +169,8 @@ class OAuth2(AuthBase):
         json = req.json()
 
         if json.get("error", None) is not None:
-            raise Exception(req.json()["error"])
+            print(f"Error occured in {self.client_data['provider']} refresh token: {json}")
+            session.pop(self.client_data["provider"], None)
 
         self.token["access"] = json["access_token"]
         self.token["expire"] = time() + json["expires_in"]
