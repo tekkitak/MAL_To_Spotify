@@ -15,11 +15,13 @@ The project utilizes the MyAnimeList API to fetch the list of anime shows that t
 
 ### Installation
 
-To install the necessary Python libraries, run the following command in your terminal:
+To setup the application
 
 ```
 git clone https://github.com/tekkitak/MAL_To_Spotify
-pip install flask
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements
 ```
 
 You will need to get MyAnimeList API key, which you can get [here](https://myanimelist.net/apiconfig/create).
@@ -28,10 +30,11 @@ You will also need to set up a Spotify developer account and create an applicati
 
 ### Usage
 
-1. Run `flask setup` and accept request to overwrite .env
-2. In your .env replace the `EXAMPLE_ID`s and `EXAMPLE_SECRET`s with your own Spotify API and MAL API credentials
-3. Run `flusk run` in your terminal to start the Flask application.
-4. Open your web browser and navigate to `http://localhost:5000`.
+1. copy example.env into .env (`cp example.env .env`)
+2. Replace all the necceseary values in your .env with editor of choice
+3. Execute `flask db-init` to initiate the database
+4. Run `flask run` in your terminal to start the Flask application.
+5. Open your web browser and navigate to `http://localhost:5000`.
 
 ### Further information
 
