@@ -1,11 +1,11 @@
 # type: ignore
-
+from typing import List, Optional, cast
 from flask_sqlalchemy import SQLAlchemy
 from flask_security.models import fsqla_v2 as fsqla
 import requests as rq
 
 db = SQLAlchemy()
-DB_VER = 1.3
+DB_VER = 1.4
 fsqla.FsModels.set_db_info(db)
 
 
@@ -34,6 +34,7 @@ class Anime(db.Model):
     openings = db.relationship(
         "Opening", secondary="anime_opening", back_populates="animes"
     )
+    anime_openings = db.relationship("Anime_opening", back_populates="anime", overlaps="animes,openings")
 
     def __repr__(self) -> str:
         return f"<Anime {self.id}, {self.anime_title}>"
@@ -50,9 +51,11 @@ class Opening(db.Model):
     songs = db.relationship(
         "Song", back_populates="opening", cascade="all, delete-orphan"
     )
+
     animes = db.relationship(
         "Anime", secondary="anime_opening", back_populates="openings"
     )
+    anime_openings = db.relationship("Anime_opening", back_populates="opening", overlaps="openings,animes")
 
     def __repr__(self) -> str:
         return f"<Opening {self.id}, {self.opening_title}>"
@@ -75,6 +78,7 @@ class Song(db.Model):
     spotify_link = db.Column(db.String(128), nullable=False)
 
     votes = db.relationship("Vote", back_populates="song", cascade="all, delete-orphan")
+    # imports = db.relationship("Import", secondary="import_song", back_populates="songs")
     imports = db.relationship("Import", secondary="import_song", back_populates="songs")
 
     def __repr__(self) -> str:
@@ -133,7 +137,9 @@ class Import(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     user = db.relationship("User", back_populates="imports")
     time = db.Column(db.DateTime, nullable=False)
+    # songs = db.relationship("Song", secondary="import_song", back_populates="imports")
     songs = db.relationship("Song", secondary="import_song", back_populates="imports")
+    import_songs = db.relationship("Import_song", back_populates="from_import", overlaps="imports,songs")
 
 
 class OAuth2(db.Model):
@@ -158,15 +164,31 @@ class Sync(db.Model):
     last_synced_at = db.Column(db.DateTime, nullable=False)
 
 
-anime_opening = db.Table(
-    "anime_opening",
-    db.Column("anime_id", db.Integer, db.ForeignKey("anime.id"), primary_key=True),
-    db.Column("opening_id", db.Integer, db.ForeignKey("opening.id"), primary_key=True),
-    db.Column("episodes", db.String(128), nullable=True),
-)
+# anime_opening = db.Table(
+#     "anime_opening",
+#     db.Column("anime_id", db.Integer, db.ForeignKey("anime.id"), primary_key=True),
+#     db.Column("opening_id", db.Integer, db.ForeignKey("opening.id"), primary_key=True),
+#     db.Column("episodes", db.String(128), nullable=True),
+# )
 
-import_song = db.Table(
-    "import_song",
-    db.Column("import_id", db.Integer, db.ForeignKey("import.id"), primary_key=True),
-    db.Column("song_id", db.Integer, db.ForeignKey("song.id"), primary_key=True),
-)
+class Anime_opening(db.Model):
+    __tablename__ = "anime_opening"
+
+    anime_id = db.Column(db.Integer, db.ForeignKey("anime.id"), primary_key=True)
+    anime = db.relationship("Anime", back_populates="anime_openings", overlaps="animes,openings")
+    opening_id = db.Column(db.Integer, db.ForeignKey("opening.id"), primary_key=True)
+    opening = db.relationship("Opening", back_populates="anime_openings", overlaps="openings,animes")
+    episodes = db.Column(db.String(128), nullable=True)
+
+class Import_song(db.Model):
+    __tablename__ = "import_song"
+
+    import_id = db.Column(db.Integer, db.ForeignKey("import.id"), primary_key=True)
+    from_import = db.relationship("Import", back_populates="import_songs", overlaps="imports,songs")
+    song_id = db.Column(db.Integer, db.ForeignKey("song.id"), primary_key=True)
+
+    @classmethod
+    def stats_by_songs(cls)-> list[dict[str, str | int]]:
+        """Get the count of imports by song"""
+        ret = db.session.query(Song, db.func.count(cls.import_id)).join(cls).group_by(cls.song_id).all()
+        return [{"song": song.song_title, "artist": song.artist.artist_name, "count": count} for song, count in ret]

@@ -3,8 +3,9 @@ from os import getenv
 from typing import Any, Optional, cast
 import requests as rq
 from flask import Blueprint, redirect, request, session, url_for
+from flask_login import current_user
 from model.oauth2 import OAuth2, SpotifyOAuth2Builder
-from model.database import Opening, Artist, Song, db
+from model.database import Opening, Artist, Song, db, Import
 
 spotify = Blueprint(
     name = "spotify",
@@ -80,6 +81,20 @@ def playlist_add_song(playlist_id: str, uris: str):
         "uris": uris.split(",")
     }
     req = rq.post(url=url, headers=headers, json=data, auth=Oauth, timeout=150)
+
+    # On success, add songs to import
+    if current_user.is_authenticated:
+        new_import = Import(
+            user_id = current_user.id,
+            time = db.func.now()
+        )
+        db.session.add(new_import)
+        for uri in uris.split(","):
+            song = Song.query.filter_by(spotify_link=uri).first()
+            if song is None:
+                continue
+            new_import.songs.append(song)
+        db.session.commit()
     return req.json()
 
 def get_spotify_song(name: str, artist: str):
