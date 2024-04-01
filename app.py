@@ -14,6 +14,7 @@ from controller.user import user
 from controller.api_root import api
 from controller.admin import admin
 from controller.api.spotify import spotify_playlists
+from controller.statistics import statistics
 
 
 # Flask setup
