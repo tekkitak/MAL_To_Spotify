@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, session
 from flask_security.signals import user_registered
 
 from model.extensions import register_extensions
+from model.oauth2 import RevokedToken
 from model.actions import register_commands
 from model.config import set_config
 from model.database import DB_VER
@@ -40,8 +41,11 @@ def check_version() -> None:
 @app.route("/")
 def index():
     playlists = []
-    if session.get("spotify_oauth", False) is not False:
-        playlists = spotify_playlists()["items"]
+    try:
+        if session.get("spotify_oauth", False) is not False:
+            playlists = spotify_playlists()["items"]
+    except RevokedToken as rt:
+        session.pop("spotify_oauth", False)
     return render_template(
         "index.j2",
         Spotify_OAuth_url=url_for("api.spotify.spotifyAuth"),
