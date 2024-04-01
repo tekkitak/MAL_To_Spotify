@@ -171,6 +171,7 @@ class OAuth2(AuthBase):
         if json.get("error", None) is not None:
             print(f"Error occured in {self.client_data['provider']} refresh token: {json}")
             session.pop(self.client_data["provider"], None)
+            return
 
         self.token["access"] = json["access_token"]
         self.token["expire"] = time() + json["expires_in"]
