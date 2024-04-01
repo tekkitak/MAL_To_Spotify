@@ -11,3 +11,5 @@ virtual.env
 pymyenv/
 venv/
 .version
+setup.cfg
+*.sqlite

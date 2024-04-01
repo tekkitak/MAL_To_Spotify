@@ -1,14 +1,17 @@
 """Simple version control system that can be used in application versioning"""
-__author__ =  "Ivo Žitník"
 
-class VersionControl():
+__author__ = "Ivo Žitník"
+
+
+class VersionControl:
     """
     Class for handling version control of the application
 
     Parameters:
         version_file (str): Custom path and name of the version file
     """
-    def __init__(self, version_file: str = '.version') -> None:
+
+    def __init__(self, version_file: str = ".version") -> None:
         self.version_file: str = version_file
         self.ver_content: dict[str, str]
 
@@ -24,14 +27,16 @@ class VersionControl():
         key: str
         value: str
         try:
-            with open('.version', 'r', encoding='utf-8') as f:
+            with open(".version", "r", encoding="utf-8") as f:
                 keypairs_str: list[str] = f.read().split(";")
                 # Loads keys from .version content
                 for keypair in keypairs_str:
-                    if keypair == '':
+                    if keypair == "":
                         continue
                     if "=" not in keypair:
-                        print(f"Invalid keypair '{keypair}' in .version file, skipping...")
+                        print(
+                            f"Invalid keypair '{keypair}' in .version file, skipping..."
+                        )
                         continue
                     key, value = keypair.split("=")
                     self.ver_content[key] = value
@@ -45,7 +50,7 @@ class VersionControl():
         Parameters:
             new_content (dict[str, str]): New content to set
         """
-        with open('.version', 'w', encoding='utf-8') as f:
+        with open(".version", "w", encoding="utf-8") as f:
             f.write("")
             for key, value in new_content.items():
                 f.write(f"{key}={value};")
@@ -59,7 +64,10 @@ class VersionControl():
             new_value (str): New value to set
         """
         if new_value is None:
-            self.ver_content.pop(key)
+            try:
+                self.ver_content.pop(key)
+            except KeyError:
+                pass
         else:
             self.ver_content[key] = new_value
 
@@ -93,3 +101,6 @@ class VersionControl():
             bool: True if the key and value match, False if not
         """
         return self.ver_content.get(key, None) == value
+
+
+verControl = VersionControl()
